@@ -1,0 +1,32 @@
+{
+  "name": "aidmanager-frontend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "fakeapi": "json-server --watch src/server/db.json"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "chart.js": "^4.4.2",
+    "json-server": "^1.0.0-alpha.23",
+    "primeflex": "^3.3.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^3.52.0",
+    "serve": "^14.2.4",
+    "v-clipboard": "^3.0.0-next.1",
+    "vue": "^3.4.21",
+    "vue-gtag": "^3.5.1",
+    "vue-i18n": "^9.13.1",
+    "vue-router": "^4.3.2",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.4.19",
+    "vite-svg-loader": "^5.1.0"
+  }
+}
