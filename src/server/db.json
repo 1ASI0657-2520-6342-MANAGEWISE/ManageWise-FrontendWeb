@@ -1,0 +1,708 @@
+{
+  "companies": [
+    {
+      "id": "1",
+      "brandName": "HealthForAll",
+      "identificationCode": "Q58mBJ",
+      "country": "Peru",
+      "phone": "32134512"
+    },
+    {
+      "id": "2",
+      "brandName": "ConnectHands",
+      "identificationCode": "DiPW3n",
+      "country": "Chile",
+      "phone": "21391218"
+    },
+    {
+      "id": "a8d3",
+      "brandName": "olapeurba",
+      "identificationCode": "yKTtwH",
+      "country": "Peru",
+      "phone": "21315212"
+    },
+    {
+      "id": "4b6f",
+      "brandName": "odebretch",
+      "country": "Peru",
+      "phone": "2139123142",
+      "identificationCode": "SnZx86"
+    },
+    {
+      "id": "d95d",
+      "brandName": "dwq",
+      "country": "dqwdwq",
+      "phone": "dqwdq",
+      "identificationCode": "E6je2pvT"
+    },
+    {
+      "id": "bea0",
+      "brandName": "FuerzaPopulr",
+      "country": "China",
+      "phone": "982182172",
+      "identificationCode": "jCo2cGqL"
+    },
+    {
+      "id": "102d",
+      "brandName": "PNP",
+      "country": "Peru",
+      "phone": "92313218",
+      "identificationCode": "1zUVflD9"
+    },
+    {
+      "id": "27f9",
+      "brandName": "JNP",
+      "country": "Peru",
+      "phone": "928318321",
+      "identificationCode": "PV0aJSKW"
+    },
+    {
+      "id": "06f6",
+      "brandName": "Fujimori",
+      "country": "Peru",
+      "phone": "311221321",
+      "identificationCode": "ZQZAlBWU"
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "firstName": "Yesi",
+      "lastName": "Hofman",
+      "email": "ramisex@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "https://avatars.githubusercontent.com/u/129230632?v=4",
+      "role": "Director",
+      "companyName": "HealthForAll"
+    },
+    {
+      "id": "2",
+      "firstName": "Sebastian",
+      "lastName": "Peña",
+      "email": "rosadita@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "https://github.com/AplicacionesWeb-WX54/si730-WX54-Grupo1-Repository/blob/main/assets/members-profile/Manuel.jpg?raw=true",
+      "role": "Team",
+      "companyName": "LoveForNeko",
+      "companyId": 1
+    },
+    {
+      "id": "3",
+      "firstName": "Neko",
+      "lastName": "Soaps",
+      "email": "neko@aidmanager.com",
+      "role": "Director",
+      "password": "admin123",
+      "profileImg": "https://github.com/AplicacionesWeb-WX54/si730-WX54-Grupo1-Repository/blob/main/assets/members-profile/arigeimpleis.jpg?raw=true",
+      "companyId": 2
+    },
+    {
+      "id": "4",
+      "firstName": "Arian",
+      "lastName": "Vago",
+      "email": "monitas123@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "https://randomuser.me/api/portraits/thumb/men/75.jpg",
+      "role": "Team",
+      "companyId": 1
+    },
+    {
+      "id": "5",
+      "firstName": "Alejandra",
+      "lastName": "Williams",
+      "email": "pelitos@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "Director"
+    },
+    {
+      "id": "6",
+      "firstName": "Mason",
+      "lastName": "Jones",
+      "email": "mason_jones@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "Team"
+    },
+    {
+      "id": "7",
+      "firstName": "Ava",
+      "lastName": "Brown",
+      "email": "ava_brown@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "Director"
+    },
+    {
+      "id": "8",
+      "firstName": "Liam",
+      "lastName": "Davis",
+      "email": "liam_davis@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "Team"
+    },
+    {
+      "id": "9",
+      "firstName": "Mia",
+      "lastName": "Miller",
+      "email": "mia_miller@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "Director"
+    },
+    {
+      "id": "098e",
+      "firstName": "wq",
+      "lastName": "dwq",
+      "email": "dqw@swqd",
+      "password": "we",
+      "profileImg": "",
+      "role": "team"
+    },
+    {
+      "id": "4284",
+      "firstName": "qwe",
+      "lastName": "ewq",
+      "email": "we@swq",
+      "password": "we",
+      "profileImg": "",
+      "role": "team"
+    },
+    {
+      "id": "d54d",
+      "firstName": "dwq",
+      "lastName": "dqw",
+      "email": "we@qww",
+      "password": "we",
+      "profileImg": "",
+      "role": "team",
+      "companyName": "HealthForAll"
+    },
+    {
+      "id": "b028",
+      "firstName": "braulio",
+      "lastName": "turrones",
+      "email": "turroncitos@wawawa.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "team",
+      "companyName": "ConnectHands"
+    },
+    {
+      "id": "a471",
+      "firstName": "sebastian",
+      "lastName": "piñera",
+      "email": "sebas@aidmanager.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "director",
+      "companyName": "JNP"
+    },
+    {
+      "id": "b686",
+      "firstName": "pablo",
+      "lastName": "webo",
+      "email": "pablo@gmail.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "team",
+      "companyName": "JNP"
+    },
+    {
+      "id": "2420",
+      "firstName": "webo",
+      "lastName": "webo",
+      "email": "webo@gmail.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "team",
+      "companyName": "PNP"
+    },
+    {
+      "id": "ff52",
+      "firstName": "webo",
+      "lastName": "webo",
+      "email": "olas@gmail.com",
+      "password": "admin123",
+      "profileImg": "",
+      "role": "director",
+      "companyName": "Fujimori"
+    },
+    {
+      "id": "14a6",
+      "firstName": "ewqeq",
+      "lastName": "qweq",
+      "email": "ewq@eqw",
+      "password": "we",
+      "profileImg": "",
+      "role": "team",
+      "companyName": ""
+    }
+  ],
+  "posts": [
+    {
+      "id": "1",
+      "name": "Djalma Dioses",
+      "email": "djalmadioses123@aidmanager.com",
+      "title": "Celebrating Team Success: Hope Heaven International's Impact in Action",
+      "description": "We are thrilled to share some exciting news and celebrate the collective efforts of our incredible team members! Together, we have achieved significant milestones and made a meaningful impact on the lives of those we serve.",
+      "profile_img": "https://mkubico.cl/img/cliente.jpg",
+      "publication_date": "24/09/23",
+      "images": [
+        "https://st3.depositphotos.com/18032542/35212/i/450/depositphotos_352121772-stock-photo-two-young-men-planting-tree.jpg",
+        "https://previews.123rf.com/images/rteelek/rteelek1706/rteelek170600113/80748198-manos-del-joven-plantando-%C3%A1rboles-j%C3%B3venes.jpg",
+        "https://static.vecteezy.com/system/resources/previews/007/991/597/non_2x/two-people-carrying-saplings-to-plant-in-a-tropical-forest-a-tree-planting-campaign-to-reduce-global-warming-the-concept-of-saving-the-world-and-reducing-global-warming-free-photo.jpg"
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Ariana Rodriguez",
+      "email": "arianrodriguez123@aidmanager.com",
+      "title": "Celebrating Team Success: Hope Heaven International's Impact in Action",
+      "description": "We are thrilled to share some exciting news and celebrate the collective efforts of our incredible team members! Together, we have achieved significant milestones and made a meaningful impact on the lives of those we serve.",
+      "profile_img": "https://avatars.githubusercontent.com/u/164218254?v=4",
+      "publication_date": "25/09/23",
+      "images": [
+        "https://st3.depositphotos.com/18032542/35212/i/450/depositphotos_352121772-stock-photo-two-young-men-planting-tree.jpg",
+        "https://previews.123rf.com/images/rteelek/rteelek1706/rteelek170600113/80748198-manos-del-joven-plantando-%C3%A1rboles-j%C3%B3venes.jpg",
+        "https://static.vecteezy.com/system/resources/previews/007/991/597/non_2x/two-people-carrying-saplings-to-plant-in-a-tropical-forest-a-tree-planting-campaign-to-reduce-global-warming-the-concept-of-saving-the-world-and-reducing-global-warming-free-photo.jpg"
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Sebastian Peña",
+      "email": "sebastianpena123@aidmanager.com",
+      "title": "Celebrating Team Success: Hope Heaven International's Impact in Action",
+      "description": "We are thrilled to share some exciting news and celebrate the collective efforts of our incredible team members! Together, we have achieved significant milestones and made a meaningful impact on the lives of those we serve.",
+      "profile_img": "https://camo.githubusercontent.com/bbba5d612eeca73f3664940dff68a626da4c2869bb9bf96f2574f76cc29cb0c1/68747470733a2f2f692e696d6775722e636f6d2f3657796f68556d2e6a706567",
+      "publication_date": "26/09/23",
+      "images": [
+        "https://st3.depositphotos.com/18032542/35212/i/450/depositphotos_352121772-stock-photo-two-young-men-planting-tree.jpg",
+        "https://previews.123rf.com/images/rteelek/rteelek1706/rteelek170600113/80748198-manos-del-joven-plantando-%C3%A1rboles-j%C3%B3venes.jpg",
+        "https://static.vecteezy.com/system/resources/previews/007/991/597/non_2x/two-people-carrying-saplings-to-plant-in-a-tropical-forest-a-tree-planting-campaign-to-reduce-global-warming-the-concept-of-saving-the-world-and-reducing-global-warming-free-photo.jpg"
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Alex Avila",
+      "email": "alexavila123@aidmanager.com",
+      "title": "Celebrating Team Success: Hope Heaven International's Impact in Action",
+      "description": "We are thrilled to share some exciting news and celebrate the collective efforts of our incredible team members! Together, we have achieved significant milestones and made a meaningful impact on the lives of those we serve.",
+      "profile_img": "https://avatars.githubusercontent.com/u/60982533?v=4",
+      "publication_date": "27/09/23",
+      "images": [
+        "https://st3.depositphotos.com/18032542/35212/i/450/depositphotos_352121772-stock-photo-two-young-men-planting-tree.jpg",
+        "https://previews.123rf.com/images/rteelek/rteelek1706/rteelek170600113/80748198-manos-del-joven-plantando-%C3%A1rboles-j%C3%B3venes.jpg",
+        "https://static.vecteezy.com/system/resources/previews/007/991/597/non_2x/two-people-carrying-saplings-to-plant-in-a-tropical-forest-a-tree-planting-campaign-to-reduce-global-warming-the-concept-of-saving-the-world-and-reducing-global-warming-free-photo.jpg"
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Maria Gonzalez",
+      "email": "mariagonzalez123@aidmanager.com",
+      "title": "Celebrating Team Success: Hope Heaven International's Impact in Action",
+      "description": "We are thrilled to share some exciting news and celebrate the collective efforts of our incredible team members! Together, we have achieved significant milestones and made a meaningful impact on the lives of those we serve.",
+      "profile_img": "https://media.licdn.com/dms/image/C4D03AQGyzxSlff9ZLQ/profile-displayphoto-shrink_800_800/0/1525420962252?e=2147483647&v=beta&t=wIZ55Qv_DIKOF3pvJhSbtzmpI1sp02fRriyEYghdOBo",
+      "publication_date": "28/09/23",
+      "images": [
+        "https://st3.depositphotos.com/18032542/35212/i/450/depositphotos_352121772-stock-photo-two-young-men-planting-tree.jpg",
+        "https://previews.123rf.com/images/rteelek/rteelek1706/rteelek170600113/80748198-manos-del-joven-plantando-%C3%A1rboles-j%C3%B3venes.jpg",
+        "https://static.vecteezy.com/system/resources/previews/007/991/597/non_2x/two-people-carrying-saplings-to-plant-in-a-tropical-forest-a-tree-planting-campaign-to-reduce-global-warming-the-concept-of-saving-the-world-and-reducing-global-warming-free-photo.jpg"
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Carlos Ramirez",
+      "email": "carlosramirez123@aidmanager.com",
+      "title": "Celebrating Team Success: Hope Heaven International's Impact in Action",
+      "description": "We are thrilled to share some exciting news and celebrate the collective efforts of our incredible team members! Together, we have achieved significant milestones and made a meaningful impact on the lives of those we serve.",
+      "profile_img": "https://media.licdn.com/dms/image/C4D03AQH2uYRINkpB1w/profile-displayphoto-shrink_800_800/0/1583840949935?e=2147483647&v=beta&t=TXbl0aR9jpZ1FHhLZqxv6zeRlh_li6txNdEzREN6up0",
+      "publication_date": "29/09/23",
+      "images": [
+        "https://st3.depositphotos.com/18032542/35212/i/450/depositphotos_352121772-stock-photo-two-young-men-planting-tree.jpg",
+        "https://previews.123rf.com/images/rteelek/rteelek1706/rteelek170600113/80748198-manos-del-joven-plantando-%C3%A1rboles-j%C3%B3venes.jpg",
+        "https://static.vecteezy.com/system/resources/previews/007/991/597/non_2x/two-people-carrying-saplings-to-plant-in-a-tropical-forest-a-tree-planting-campaign-to-reduce-global-warming-the-concept-of-saving-the-world-and-reducing-global-warming-free-photo.jpg"
+      ]
+    }
+  ],
+  "team-members": [
+    {
+      "image": "https://avatars.githubusercontent.com/u/129230632?v=4",
+      "name": "Blanqui Tita",
+      "email": "blanquita@hotmans.com",
+      "id": "39cb"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/AplicacionesWeb-WX54/si730-WX54-Grupo1-Repository/main/assets/members-profile/Manuel.jpg",
+      "name": "Rosa Dita",
+      "email": "rosadita@hotmans.com",
+      "id": "7f5e"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/AplicacionesWeb-WX54/si730-WX54-Grupo1-Repository/main/assets/members-profile/nekolas-profile.png",
+      "name": "Nicola Hotman",
+      "email": "nicola@hotmans.com",
+      "id": "1778"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/AplicacionesWeb-WX54/si730-WX54-Grupo1-Repository/main/assets/members-profile/pelufoto.png",
+      "name": "Oala Yesi",
+      "email": "oalayesi@hotmans.com",
+      "id": "27fb"
+    }
+  ],
+  "messages": [
+    {
+      "id": "9dd5",
+      "idMember": {
+        "date": "2024-05-17T04:35:46.243Z",
+        "message": "asasd",
+        "sender": "Rosa Dita"
+      }
+    },
+    {
+      "id": "3eac",
+      "idMember": {
+        "date": "2024-05-17T04:36:08.753Z",
+        "message": "sdsad"
+      },
+      "name": "BREBAJE FINAL",
+      "date": "2024-05-26",
+      "location": "asd",
+      "description": "asd",
+      "color": "#74A38F"
+    },
+    {
+      "id": "1f60",
+      "name": "Wariqui",
+      "date": "2024-05-16",
+      "location": "Brebaje pre retiro",
+      "description": "traer brebaje",
+      "color": "#98CFD7"
+    },
+    {
+      "id": "d1f6",
+      "name": "BREBAJE POST RETIRO",
+      "date": "2024-05-20",
+      "location": "yesihuarique",
+      "description": "",
+      "color": "#98CFD7"
+    },
+    {
+      "id": "70a5",
+      "name": "Wariqui",
+      "date": "2024-05-16",
+      "location": "Mello Arranco",
+      "description": "brebaje pre retiro",
+      "color": "#74A38F"
+    }
+  ],
+  "analytics": [
+    {
+      "id": "1",
+      "title": "Currents Stats",
+      "values": [
+        {
+          "time": "13%",
+          "tasks": "6",
+          "workload": "0",
+          "progress": "33,33%",
+          "cost": "35%"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Tasks",
+      "values": [
+        {
+          "to-do": 200,
+          "in-progress": 100,
+          "done": 400
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "Progress-line",
+      "values": [
+        {
+          "current": [
+            28,
+            48,
+            20,
+            119,
+            86,
+            27,
+            90,
+            28,
+            48,
+            20,
+            119,
+            86
+          ],
+          "expected": [
+            65,
+            59,
+            80,
+            81,
+            56,
+            57,
+            40,
+            65,
+            59,
+            80,
+            81,
+            59
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "title": "Payments",
+      "values": [
+        {
+          "current": [
+            28,
+            48,
+            40
+          ],
+          "expected": [
+            65,
+            59,
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "title": "Progress-bar",
+      "values": [
+        {
+          "current": [
+            28,
+            48,
+            40
+          ],
+          "expected": [
+            65,
+            59,
+            80
+          ]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "1",
+      "name": "Clean Carpayo Beach",
+      "image": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRlwAa3FhsapzrIDW2IyMtMjR0VTgOmKkEXw6_N60MahSJE_N9Y",
+      "description": "Cleaning Clean Carpayo Beach is a project that aims to clean the beach of Carpayo, located in the district of San Juan de Lurigancho. The project is carried out by a group of volunteers who are committed to the environment and the cleanliness of the beaches.",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Tarea 1",
+          "assigned": "personaX",
+          "due": "7/10/2018 00:00",
+          "status": "Doing"
+        },
+        {
+          "id": 2,
+          "title": "Tarea 2",
+          "assigned": "personaY",
+          "due": "7/15/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 3,
+          "title": "Tarea 3",
+          "assigned": "personaZ",
+          "due": "7/20/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 4,
+          "title": "Tarea 4",
+          "assigned": "personaX",
+          "due": "7/25/2018 00:00",
+          "status": "Done"
+        },
+        {
+          "id": 5,
+          "title": "Tarea 5",
+          "assigned": "personaY",
+          "due": "7/30/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 6,
+          "title": "Tarea 6",
+          "assigned": "personaZ",
+          "due": "8/5/2018 00:00",
+          "status": "Doing"
+        },
+        {
+          "id": 7,
+          "title": "Tarea 7",
+          "assigned": "personaX",
+          "due": "8/10/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 8,
+          "title": "Tarea 8",
+          "assigned": "personaY",
+          "due": "8/15/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 9,
+          "title": "Tarea 9",
+          "assigned": "personaZ",
+          "due": "8/20/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 10,
+          "title": "Tarea 10",
+          "assigned": "personaX",
+          "due": "8/25/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 11,
+          "title": "Tarea 11",
+          "assigned": "EseYesi",
+          "due": "872jks",
+          "status": "To-Do"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Clean Carpayo Beach3",
+      "image": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRlwAa3FhsapzrIDW2IyMtMjR0VTgOmKkEXw6_N60MahSJE_N9Y",
+      "description": "Cleaning Clean Carpayo Beach is a project that aims to clean the beach of Carpayo, located in the district of San Juan de Lurigancho. The project is carried out by a group of volunteers who are committed to the environment and the cleanliness of the beaches.",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Tarea 1",
+          "assigned": "personaX",
+          "due": "7/10/2018 00:00",
+          "status": "Done"
+        },
+        {
+          "id": 2,
+          "title": "Tarea 2",
+          "assigned": "personaY",
+          "due": "7/15/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 3,
+          "title": "Tarea 3",
+          "assigned": "personaZ",
+          "due": "7/20/2018 00:00",
+          "status": "Doing"
+        },
+        {
+          "id": 4,
+          "title": "Tarea 4",
+          "assigned": "personaX",
+          "due": "7/25/2018 00:00",
+          "status": "Done"
+        },
+        {
+          "id": 5,
+          "title": "Tarea 5",
+          "assigned": "personaY",
+          "due": "7/30/2018 00:00",
+          "status": "To-Do"
+        },
+        {
+          "id": 6,
+          "title": "sas",
+          "assigned": "ass",
+          "due": "2024-05-16T05:00:00.000Z",
+          "status": "To-Do"
+        },
+        {
+          "id": 7,
+          "title": "ad",
+          "assigned": "sdf",
+          "due": "2024-05-21T05:00:00.000Z",
+          "status": "Doing"
+        }
+      ],
+      "members": [
+        {
+          "id": 1,
+          "name": "personaX",
+          "email": "isiyisi@yisi.com",
+          "role": "Project Leader",
+          "image": "https://static.wikia.nocookie.net/breakingbad/images/5/52/BB_S5A_Jesse_Pinkman.png/revision/latest?cb=20221026171345&path-prefix=es"
+        },
+        {
+          "id": 2,
+          "name": "personaY",
+          "email": "personay@example.com",
+          "role": "Volunteer",
+          "image": "https://example.com/avatar2.jpg"
+        },
+        {
+          "id": 3,
+          "name": "personaZ",
+          "email": "personaz@example.com",
+          "role": "Volunteer",
+          "image": "https://example.com/avatar3.jpg"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "wqd",
+      "image": "wdq",
+      "description": "dwqd",
+      "tasks": [],
+      "members": []
+    }
+  ],
+  "events": [
+    {
+      "id": "512b",
+      "name": "BREBAJE FINAL",
+      "date": "2024-05-26",
+      "location": "asd",
+      "description": "asd",
+      "color": "#98CFD7"
+    },
+    {
+      "id": "ebe1",
+      "name": "brebaje",
+      "date": "2024-05-04",
+      "location": "el brebaje",
+      "description": "el brebaje obligatorio",
+      "color": "#74A38F"
+    },
+    {
+      "id": "70a5",
+      "name": "Wariqui",
+      "date": "2024-05-16",
+      "location": "Mello Arranco",
+      "description": "brebaje pre retiro",
+      "color": "#74A38F"
+    },
+    {
+      "id": "34b4",
+      "name": "BREBAJE POST RETIRO",
+      "date": "2024-05-20",
+      "location": "yesihuarique",
+      "description": "",
+      "color": "#98CFD7"
+    }
+  ]
+}
