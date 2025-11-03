@@ -131,8 +131,8 @@ export default {
 <template>
   <div class="signup-container min-h-screen flex">
     <div class="logo-container flex">
-      <img src="../../assets/logoAidManager.png" alt="logo" />
-      <span class="font-bold text-4xl">AidManager</span>
+      <img src="../../assets/ManageWise_logo.png" alt="logo" />
+      <span class="font-bold text-4xl">ManageWise</span>
     </div>
     <div class="card flex">
       <span class="title font-normal" style="font-size:1rem">Transform your fundraising efforts with precision
@@ -223,13 +223,13 @@ export default {
 
 <style scoped>
 .error-message {
-  color: red;
+  color: #A32E2E;
   font-size: 0.8rem;
   margin-top: 5px;
 }
 
 .signup-container {
-  background-color: #E6F4E2;
+  background-color: #F5F7F8;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
@@ -248,14 +248,27 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  margin-top: 4rem;
+  margin-top: 3rem;
+}
+
+.logo-container img {
+  width: 80px; /* tamaño ajustado del logo */
+  height: auto;
+}
+
+.logo-container span {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #34424A;
+  letter-spacing: 1px;
 }
 
 .card {
   width: 100%;
   max-width: 700px;
   background-color: #fff;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
   height: auto;
   text-align: center;
   justify-content: center;
@@ -266,15 +279,24 @@ export default {
 
 .title {
   margin-bottom: 40px;
-  font-size: 0.8rem;
+  font-size: 1rem;
+  color: #34424A;
 }
 
 .input-field {
   align-self: center;
   width: 100%;
-  border-radius: 20px;
+  border-radius: 25px;
   border: 1px solid #BDBDBD;
-  color: #0009;
+  color: #34424A;
+  padding: 12px 45px 12px 15px;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  background-color: #F7F7F7;
+  border-color: #F47C26;
+  outline: none;
 }
 
 .user-name-container {
@@ -285,29 +307,30 @@ export default {
   gap: 10px;
 }
 
-.input-field:focus {
-  background-color: #F7F7F7;
-}
-
 .button {
   width: 40%;
   align-self: center;
-  background-color: #02513D;
+  background-color: #F47C26;
   border: none;
   border-radius: 30px;
   cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.2s ease;
 }
 
 .button:hover {
-  background-color: #024030;
+  background-color: #D4641F;
 }
 
 .link {
   width: 90%;
   align-self: center;
   text-align: right;
-  color: #02513D;
+  color: #34424A;
   text-decoration: none;
+  font-style: italic;
+  font-size: 0.85rem;
 }
 
 .card-footer {
@@ -328,24 +351,22 @@ export default {
   margin-right: 25px;
   line-height: 32px;
   font-size: 0.9rem;
+  color: #34424A;
 }
 
 .radio-input {
   appearance: none;
-
   border-radius: 50%;
   width: 16px;
   height: 16px;
-
   border: 2px solid #999;
   transition: 0.2s all linear;
   margin-right: 5px;
-
   position: relative;
 }
 
 .radio-input:checked {
-  border: 8px solid #02513D;
+  border: 8px solid #F47C26;
 }
 
 .confirm-password-field {
@@ -365,12 +386,21 @@ export default {
   position: absolute;
   right: 15px;
   cursor: pointer;
+  font-size: 1.1rem;
 }
 
 @media screen and (max-width: 500px) {
   .logo-container {
     flex-direction: column;
     text-align: center;
+  }
+
+  .logo-container img {
+    width: 70px;
+  }
+
+  .logo-container span {
+    font-size: 1.6rem;
   }
 
   .input-field {
@@ -390,9 +420,7 @@ export default {
     width: 100%;
     gap: 1rem;
   }
-}
 
-@media screen and (max-width: 560px) {
   .button {
     width: 80%;
   }
