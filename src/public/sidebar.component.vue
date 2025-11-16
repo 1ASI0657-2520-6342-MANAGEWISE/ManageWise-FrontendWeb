@@ -33,7 +33,18 @@ export default {
     }
   },
   computed: {
-    ...mapState(['user'])
+    ...mapState(['user']),
+    roleLower() {
+      return (this.user?.role ?? '').toString().trim().toLowerCase();
+    },
+    isManager() {
+      return this.roleLower === 'manager';
+    },
+    hasUser() {
+      // si quieres: solo mostrar Team cuando hay usuario cargado
+      return !!this.user && Object.keys(this.user).length > 0;
+    }
+
   },
   methods: {
     navigateToHome() {
@@ -95,17 +106,20 @@ export default {
             <CalendarIcon></CalendarIcon>
             <p class="font-medium text-base " v-t="'sidebar.calendar'">Calendar</p>
           </li>
+          <!-- Create Post: solo para Manager -->
           <li class="flex flex-row gap-3 align-items-center py-3 pl-4 border-round-md"
               @click="navigateToCreatePost"
               :class="{ active: $route.path === '/new-post' }"
-              v-if="user && user.role && user.role.toLowerCase() === 'manager'">
+              v-if="isManager">
             <PostIcon></PostIcon>
             <p class="font-medium text-base" v-t="'sidebar.createpost'">Create Post</p>
           </li>
+
+          <!-- Team: visible para TODOS los roles (incluye Manager) -->
           <li class="flex flex-row gap-3 align-items-center py-3 pl-4 border-round-md"
               @click="navigateToTeam"
               :class="{ active: $route.path === '/team' }"
-              v-else>
+              v-if="hasUser">
             <TeamIcon></TeamIcon>
             <p class="font-medium text-base">Team</p>
           </li>

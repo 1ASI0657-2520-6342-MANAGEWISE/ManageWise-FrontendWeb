@@ -1,5 +1,6 @@
 <script>
-import {PostApiService} from "@/services/post.service.js";
+// new-post-content.component.vue (solo el script)
+import { PostApiService } from "@/services/post.service.js";
 
 export default {
   name: "new-post-content",
@@ -7,45 +8,45 @@ export default {
     return {
       hasCompleted: false,
       isFieldsEmpty: false,
-      formPost: {
-        title: '',
-        subject: '',
-        description: ''
-      },
-      postApi: new PostApiService()
-    }
+      formPost: { title: "", subject: "", description: "", images: []},
+      postApi: new PostApiService(),
+      // files: [] // si luego agregas subida de archivos
+    };
   },
   computed: {
-    user() {
-      return this.$store.state.user;
-    }
+    user() { return this.$store.state.user; }
   },
   methods: {
-
-    onSubmitPost() {
-      console.log(this.formPost);
-
-      if (!this.areFieldsEmpty()) {
+    async onSubmitPost() {
+      if (!this.areFieldsFilled()) {
         this.isFieldsEmpty = true;
         return;
       }
-      else {
-        this.hasCompleted = true;
+
+      try {
+        await this.postApi.createNewPost(this.user.id, this.user.companyId, this.formPost /*, this.files */);
+        this.hasCompleted = true; // <-- ahora sí, solo tras éxito
+        // opcional: limpiar formulario
+        this.formPost = { title: "", subject: "", description: "" };
+      } catch (e) {
+        const data = e?.response?.data;
+        const msg = data?.errors
+            ? Object.entries(data.errors).map(([k, v]) => `${k}: ${v.join(" | ")}`).join("\n")
+            : (data?.title || data?.message || "Error al crear post");
+        console.error("Error creando post:", e?.response?.status, data || e);
+        this.$toast?.add?.({ severity: "error", summary: "No se pudo publicar", detail: msg, life: 6000 });
       }
-
-      this.postApi.createNewPost(this.user.id, this.user.companyId, this.formPost)
-          .then(response => {
-            console.log(response);
-          })
-
     },
-
-    areFieldsEmpty() {
-      return this.formPost.title && this.formPost.subject && this.formPost.description;
-    },
-
+    areFieldsFilled() {
+      return Boolean(
+          (this.formPost.title || "").trim() &&
+          (this.formPost.subject || "").trim() &&
+          (this.formPost.description || "").trim()
+      );
+    }
   }
-}
+};
+
 </script>
 
 <template>

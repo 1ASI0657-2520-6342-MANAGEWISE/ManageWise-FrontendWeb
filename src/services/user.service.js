@@ -21,17 +21,18 @@ export class UserService {
         }
     }
 
-    async signInUser(username, password) {
+    async signInUser(username, password, captchaToken) {
         try {
             return await this.http.post('authentication/sign-in', {
                 email: username,
-                password: password
+                password: password,
+                captchaToken
             })
-        }catch(e) {
+        } catch (e) {
             return e;
         }
-
     }
+
 
     async getAllUsers() {
         try {
@@ -92,35 +93,30 @@ export class UserService {
     }
 
     async updateUser(user) {
-        try {
-            const headers = this.getHeadersAuthorization();
-            console.log('user to update', user)
+        const headers = this.getHeadersAuthorization();
 
-            const parts = user.name.trim().split(' ');
+        const safeName = (user.name ?? `${user.firstName ?? ''} ${user.lastName ?? ''}`).trim();
+        const parts = safeName.split(/\s+/);
+        const firstName = user.firstName ?? (parts[0] || '');
+        const lastName  = user.lastName  ?? (parts.slice(1).join(' ') || '');
 
-            // Primer nombre es el primer elemento
-            const firstName = parts[0] || '';
+        const userbody = {
+            firstName,
+            lastName,
+            age: user.age,
+            phone: user.phone,
+            email: user.email,
+            password: user.password,
+            profileImg: user.profileImg,
+            // SI quieres que persistan:
+            occupation: user.occupation,
+            bio: user.bio,
+        };
 
-            // Segundo nombre será el resto de la cadena después del primer nombre (si hay más)
-            const lastName = parts.slice(1).join(' ') || '';
-
-            const userbody = {
-                firstName: firstName,
-                lastName: lastName,
-                age: user.age,
-                phone: user.phone,
-                email: user.email,
-                password: user.password,
-                profileImg: user.profileImg,
-            }
-            console.log('userbody', userbody)
-            const response = await this.http.put(`users/${user.id}`, userbody, { headers });
-            return response.data;
-        } catch (error) {
-            console.error('Error al actualizar el usuario:', error);
-            throw error;
-        }
+        const resp = await this.http.put(`users/${user.id}`, userbody, { headers });
+        return resp.data;
     }
+
 
     async updateUserByEmail(email, body) {
         const newBody = {

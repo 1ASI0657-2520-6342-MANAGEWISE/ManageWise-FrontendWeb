@@ -10,7 +10,12 @@ export default {
       users: [],
       confirmPassword: '',
       passwordFieldType: 'password',
-     currentStep: 1,
+      currentStep: 1,
+      isSubmitting: false,
+      showSuccessDialog: false,
+      success_message: "Account created successfully! You can now sign in.",
+      apiError: "",
+
       form: {
         firstName: "",
         lastName: "",
@@ -35,71 +40,62 @@ export default {
     }
   },
   async created() {
-    //await this.getUsers();
   },
   methods: {
-
     async getUsers() {
-      // obtenemos la respuesta del endpoint
       const response = await this.userService.getAllUsers();
-
       this.users = response.data;
-      console.log(response.data);
     },
 
     async onSubmitRegister() {
-      // Create a new user using the userService or the function and call the service
+      this.apiError = "";
+      // Validaciones existentes
       const formValidationOne = await this.registerService.validatePrimaryRegisterData(this.form, this.confirmPassword);
       const formValidationTwo = await this.registerService.validateSecondaryRegisterData(this.form);
-      
-      console.log(formValidationOne.valid, ': formValidation1');
-      console.log(formValidationTwo.valid, ': formValidation2');
+
       if(!formValidationOne.valid || !formValidationTwo.valid){
         if(!formValidationOne.valid){
-          console.log('step 1 is not ok...', formValidationOne.errors );    
           this.errors = formValidationOne.errors;
-  
-        }
-        else if(!formValidationTwo.valid){
-          console.log('step 2 is not ok...', formValidationTwo.errors);
+        } else {
           this.errors = formValidationTwo.errors;
         }
         return false;
-      }else{
-        console.log('forms are ok...');      
-        this.errors = {};
-        console.log('Sending Data:', this.form);
-        // Sign Up User
-        const response = await this.registerService.signUpUser(this.form);
-
       }
 
-    },
+      // Envío
+      this.errors = {};
+      this.isSubmitting = true;
+      try {
+        const response = await this.registerService.signUpUser(this.form);
 
+        // Si el backend responde OK/Created mostramos el modal de éxito
+        if (response && (response.status === 200 || response.status === 201)) {
+          this.showSuccessDialog = true;
+        } else {
+          // opcional: podrías mostrar un diálogo de error si quieres
+          this.apiError = response?.data ?? "Could not complete registration.";
+        }
+      } catch (e) {
+        this.apiError = e?.response?.data ?? e?.message ?? "Unexpected error.";
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
 
     async validatePrimaryRegisterData(){
       const formValidationOne = await this.registerService.validatePrimaryRegisterData(this.form, this.confirmPassword);
       if(!formValidationOne.valid){
-        console.log('step 1 is not ok...', formValidationOne.errors );  
         this.errors = formValidationOne.errors;
         return false;
-      }else{
+      } else {
         this.errors = formValidationOne.errors;
-        console.log('step 1 is ok...');      
         this.currentStep = 2;
       }
     },
 
-
-    // validate fields in current step -> validate fields in next step -> submit form
-
-
-
     isValidEmail(email) {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!emailRegex.test(email)) {
-        return false;
-      }
+      if (!emailRegex.test(email)) return false;
       this.errors.email = '';
       return true;
     },
@@ -110,7 +106,6 @@ export default {
 
     goToLogin() {
       this.$store.commit('clearForm');
-      this.isUserCreated = false;
       this.$router.push('/login');
     },
 
@@ -118,21 +113,19 @@ export default {
       if (this.currentStep === 1) {
         this.currentStep = 2;
       } else if (this.currentStep === 2) {
-        // Si estás en el paso 2, puedes regresar al paso 1
         this.currentStep = 1;
         this.errors = {};
       }
     },
   }
 }
-
 </script>
 
 <template>
   <div class="signup-container min-h-screen flex">
     <div class="logo-container flex">
-      <img src="../../assets/ManageWise_logo.png" alt="logo" />
-      <span class="font-bold text-4xl">ManageWise</span>
+      <img src="../../assets/logoAidManager.png" alt="logo" />
+      <span class="font-bold text-4xl">AidManager</span>
     </div>
     <div class="card flex">
       <span class="title font-normal" style="font-size:1rem">Transform your fundraising efforts with precision
@@ -157,40 +150,38 @@ export default {
             <p v-if="errors.email" class="error-message">{{ errors.email }}</p>
           </div>
 
-          <div class="input-container"><input type="password" placeholder="Password" class="input-field p-3" v-model="form.password" />
+          <div class="input-container">
+            <input type="password" placeholder="Password" class="input-field p-3" v-model="form.password" />
             <p v-if="errors.password" class="error-message">{{ errors.password }}</p>
           </div>
 
-
           <div class="confirm-password-field">
             <input :type="passwordFieldType" placeholder="Confirm password" class="input-field p-3"
-              v-model="confirmPassword" />
+                   v-model="confirmPassword" />
             <i :class="passwordFieldType === 'password' ? 'pi pi-eye' : 'pi pi-eye-slash'"
-              @click="togglePasswordFieldType" class="toggle-icon"></i>
+               @click="togglePasswordFieldType" class="toggle-icon"></i>
           </div>
         </div>
 
-
-        <!--Paso 2 del formulario para validar TRG o agregar datos de la compania-->
+        <!-- Paso 2 (SIN cambios de layout/CSS) -->
         <div v-if="currentStep === 2">
           <form class="flex flex-column gap-3" @submit.prevent="completeRegistration()">
             <h2>Almost there!</h2>
             <div v-if="form.role === 'team'">
               <input type="text" placeholder="Team Register Code" class="input-field p-3"
-                v-model="form.teamRegisterCode" />
+                     v-model="form.teamRegisterCode" />
             </div>
             <div v-if="form.role === 'director'">
               <div class="flex flex-column gap-3">
                 <input type="text" placeholder="Company Name" class="input-field p-3" v-model="form.companyName" />
-                <div><input type="email" placeholder="Company Email" class="input-field p-3"
-                    v-model="form.companyEmail" />
+                <div>
+                  <input type="email" placeholder="Company Email" class="input-field p-3"
+                         v-model="form.companyEmail" />
                   <p v-if="errors.email" class="error-message">{{ errors.email }}</p>
                 </div>
-
                 <input type="text" placeholder="Company Country" class="input-field p-3"
-                  v-model="form.companyCountry" />
+                       v-model="form.companyCountry" />
               </div>
-
             </div>
           </form>
         </div>
@@ -203,33 +194,55 @@ export default {
           <label class="radio-label" for="team">Team</label>
         </div>
         <p v-if="errors.role" class="error-message">{{ errors.role }}</p>
+
         <div class="flex flex-row gap-3 justify-content-center align-items-center">
           <button type="button" v-if="currentStep === 2" class="button p-3" style="color: #fff; margin-top:30px"
-            @click="nextStep">Return</button>
+                  :disabled="isSubmitting"
+                  @click="nextStep">Return</button>
+
           <button type="button" v-if="currentStep === 1" class="button p-3" style="color: #fff; margin-top:30px"
-            @click="validatePrimaryRegisterData">Continiue</button>
-          <button type="submit" v-if="currentStep === 2" class="button p-3" style="color: #fff; margin-top:30px">Sign
-            up</button>
+                  :disabled="isSubmitting"
+                  @click="validatePrimaryRegisterData">Continue</button>
+
+          <button type="submit" v-if="currentStep === 2" class="button p-3" style="color: #fff; margin-top:30px"
+                  :disabled="isSubmitting">
+            {{ isSubmitting ? 'Creating...' : 'Sign up' }}
+          </button>
         </div>
-
       </form>
-
     </div>
+
     <h3 class="card-footer">Already have an account?
       <router-link to="/login" class="link" style="font-weight: 600">Log in</router-link>
     </h3>
+
+    <!-- NUEVO: diálogo de éxito (no cambia tu layout) -->
+    <pv-dialog :style="{margin: '0 10px'}"
+               :visible.sync="showSuccessDialog"
+               :modal="true"
+               :closable="false">
+      <div class="p-5 flex flex-column align-items-center gap-5 text-center">
+        <i class="text-7xl pi pi-check-circle text-green-500"></i>
+        <h1>Registration successful!</h1>
+        <p class="text-md">{{ success_message }}</p>
+        <div class="flex gap-3">
+          <pv-button class="py-3 px-5" label="Go to login" @click="goToLogin"/>
+          <pv-button class="py-3 px-5 p-button-text" label="Close" @click="showSuccessDialog=false"/>
+        </div>
+      </div>
+    </pv-dialog>
   </div>
 </template>
 
 <style scoped>
 .error-message {
-  color: #A32E2E;
+  color: red;
   font-size: 0.8rem;
   margin-top: 5px;
 }
 
 .signup-container {
-  background-color: #F5F7F8;
+  background-color: #E6F4E2;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
@@ -248,27 +261,14 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  margin-top: 3rem;
-}
-
-.logo-container img {
-  width: 80px; /* tamaño ajustado del logo */
-  height: auto;
-}
-
-.logo-container span {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #34424A;
-  letter-spacing: 1px;
+  margin-top: 4rem;
 }
 
 .card {
   width: 100%;
   max-width: 700px;
   background-color: #fff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
   height: auto;
   text-align: center;
   justify-content: center;
@@ -279,24 +279,14 @@ export default {
 
 .title {
   margin-bottom: 40px;
-  font-size: 1rem;
-  color: #34424A;
-}
+  font-size: 0.8rem; }
 
 .input-field {
   align-self: center;
   width: 100%;
-  border-radius: 25px;
+  border-radius: 20px;
   border: 1px solid #BDBDBD;
-  color: #34424A;
-  padding: 12px 45px 12px 15px;
-  transition: all 0.2s ease;
-}
-
-.input-field:focus {
-  background-color: #F7F7F7;
-  border-color: #F47C26;
-  outline: none;
+  color: #0009;
 }
 
 .user-name-container {
@@ -307,30 +297,29 @@ export default {
   gap: 10px;
 }
 
+.input-field:focus {
+  background-color: #F7F7F7;
+}
+
 .button {
   width: 40%;
   align-self: center;
-  background-color: #F47C26;
+  background-color: #02513D;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  color: #fff;
-  font-weight: 600;
-  transition: background 0.2s ease;
 }
 
 .button:hover {
-  background-color: #D4641F;
+  background-color: #024030;
 }
 
 .link {
   width: 90%;
   align-self: center;
   text-align: right;
-  color: #34424A;
+  color: #02513D;
   text-decoration: none;
-  font-style: italic;
-  font-size: 0.85rem;
 }
 
 .card-footer {
@@ -351,7 +340,6 @@ export default {
   margin-right: 25px;
   line-height: 32px;
   font-size: 0.9rem;
-  color: #34424A;
 }
 
 .radio-input {
@@ -366,7 +354,7 @@ export default {
 }
 
 .radio-input:checked {
-  border: 8px solid #F47C26;
+  border: 8px solid #02513D;
 }
 
 .confirm-password-field {
@@ -386,7 +374,6 @@ export default {
   position: absolute;
   right: 15px;
   cursor: pointer;
-  font-size: 1.1rem;
 }
 
 @media screen and (max-width: 500px) {
@@ -394,33 +381,23 @@ export default {
     flex-direction: column;
     text-align: center;
   }
-
-  .logo-container img {
-    width: 70px;
-  }
-
-  .logo-container span {
-    font-size: 1.6rem;
-  }
-
   .input-field {
     width: 100%;
   }
-
   .confirm-password-field {
     width: 100%;
   }
-
   .link {
     width: 100%;
   }
-
   .user-name-container {
     flex-direction: column;
     width: 100%;
     gap: 1rem;
   }
+}
 
+@media screen and (max-width: 560px) {
   .button {
     width: 80%;
   }

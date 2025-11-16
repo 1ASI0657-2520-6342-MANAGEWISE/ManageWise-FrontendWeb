@@ -7,13 +7,39 @@ export default {
   name: "ProfileContent",
   computed: {
     user() {
-      return this.$store.state.user;
+      return this.$store.state.user || {};
+    },
+    displayHeaderName() {
+      const u = this.user;
+
+      // Preferimos firstName/lastName si existen
+      const firstNameToken = (u.firstName || '').trim().split(/\s+/)[0] || '';
+      const firstSurnameToken = (u.lastName || '').trim().split(/\s+/)[0] || '';
+
+      if (firstNameToken || firstSurnameToken) {
+        return [firstNameToken, firstSurnameToken].filter(Boolean).join(' ').trim();
+      }
+
+      // Si solo viene 'name'
+      const full = (u.name || '').trim();
+      if (!full) return '';
+
+      const parts = full.split(/\s+/);
+      if (parts.length === 1) return parts[0];
+      if (parts.length === 2) return `${parts[0]} ${parts[1]}`;
+      return `${parts[0]} ${parts[parts.length - 2]}`; // asumimos penúltimo como primer apellido
     },
     filteredTasks() {
-    return this.tasks
-      .filter(task => !this.taskFilters.status || task.status === this.taskFilters.status)
-      .filter(task => !this.taskFilters.date || task.dueDate === this.taskFilters.date);
-  }
+      return this.tasks
+          .filter(task => !this.taskFilters.status || task.status === this.taskFilters.status)
+          .filter(task => !this.taskFilters.date || task.dueDate === this.taskFilters.date);
+    },
+    isManager() {
+      return this.user?.role === 'Manager';
+    },
+    teamCode() {
+      return this.user?.teamRegisterCode || '';
+    }
   },
   data() {
     return {
@@ -40,11 +66,11 @@ export default {
         bio: false,
         profileImg: false
       },
-       tasks: [],
-    taskFilters: {
-      status: '',
-      date: ''
-    }
+      tasks: [],
+      taskFilters: {
+        status: '',
+        date: ''
+      }
 
     }
   },
@@ -64,15 +90,33 @@ export default {
 
     togglePopUp() {
       this.showPopUp = !this.showPopUp;
+
+      if (this.showPopUp) {
+        const parts = (this.user.name || '').trim().split(/\s+/);
+        const firstName = parts[0] || '';
+        const lastName  = parts.slice(1).join(' ');
+        this.inputUpdateInfo = {
+          firstName,
+          lastName,
+          email: this.user.email || '',
+          age: this.user.age ?? '',
+          phone: this.user.phone || '',
+          occupation: this.user.occupation || '',
+          bio: this.user.bio || '',
+          profileImg: this.user.profileImg || ''
+        };
+      }
+
       this.editField = {
-        fullName: false,
-        email: false,
-        age: false,
-        phone: false,
-        occupation: false,
-        bio: false,
-        profileImg: false
+        fullName: false, email: false, age: false, phone: false,
+        occupation: false, bio: false, profileImg: false
       };
+    },
+    validatePhone(e) {
+      const raw = e.target.value || '';
+      const clean = raw.replace(/\D+/g, '').slice(0, 9);
+      this.inputUpdateInfo.phone = clean;
+      e.target.value = clean;
     },
     async updateProfileImg() {
       if(this.inputUpdateInfo.profileImg === "") {
@@ -112,73 +156,83 @@ export default {
     },
 
     async updateProfile() {
+      // Validación: solo valida campos que sí estén en edición
+      if (this.editField.fullName) {
+        if (!this.inputUpdateInfo.firstName?.trim() || !this.inputUpdateInfo.lastName?.trim()) {
+          this.isFieldsEmpty = true; return;
+        }
+      }
+      if (this.editField.age && !this.inputUpdateInfo.age) { this.isFieldsEmpty = true; return; }
+      if (this.editField.phone && !this.inputUpdateInfo.phone) { this.isFieldsEmpty = true; return; }
+      if (this.editField.occupation && !this.inputUpdateInfo.occupation) { this.isFieldsEmpty = true; return; }
+      if (this.editField.bio && !this.inputUpdateInfo.bio) { this.isFieldsEmpty = true; return; }
+      if (this.editField.profileImg && !this.inputUpdateInfo.profileImg) { this.isFieldsEmpty = true; return; }
 
-      // verificamos si los campos de entrada están vacíos
-      if (((!this.inputUpdateInfo.firstName || !this.inputUpdateInfo.lastName) && this.editField['fullName'])|| (!this.inputUpdateInfo.age && this.editField['age']) || (!this.inputUpdateInfo.phone && this.editField['phone']) || (!this.inputUpdateInfo.occupation && this.editField['occupation']) || (!this.inputUpdateInfo.bio && this.editField['bio']) || (!this.inputUpdateInfo.profileImg && this.editField['profileImg'])
-      ) {
-        this.isFieldsEmpty = true;
-        return;
+      if (this.editField.phone) {
+        if (!/^\d{9}$/.test(this.inputUpdateInfo.phone)) {
+          alert('El teléfono debe tener exactamente 9 dígitos numéricos.');
+          return;
+        }
       }
+      // Construye solo los campos cambiados (PATCH-like)
+      const onlyUpdated = {};
 
-      // si no se ha dado click en el lapiz para editar el campo, se le asigna el valor actual del usuario
-      if (!this.editField['fullName']) {
-        this.user.name = this.inputUpdateInfo.firstName + " " + this.inputUpdateInfo.lastName;
-        
+      if (this.editField.fullName) {
+        const fn = this.inputUpdateInfo.firstName.trim();
+        const ln = this.inputUpdateInfo.lastName.trim();
+        onlyUpdated.name = `${fn} ${ln}`;
       }
-      if (!this.editField['email']) {
-        this.inputUpdateInfo.email = this.user.email;
-      }
-      if (!this.editField['age']) {
-        this.inputUpdateInfo.age = this.user.age;
-      }
-      if (!this.editField['phone']) {
-        this.inputUpdateInfo.phone = this.user.phone;
-      }
-      if (!this.editField['occupation']) {
-        this.inputUpdateInfo.occupation = this.user.occupation;
-      }
-      if (!this.editField['bio']) {
-        this.inputUpdateInfo.bio = this.user.bio;
-      }
-      if (!this.editField['profileImg']) {
-        this.inputUpdateInfo.profileImg = this.user.profileImg;
-      }
+      if (this.editField.age)        onlyUpdated.age        = Number(this.inputUpdateInfo.age);
+      if (this.editField.phone)      onlyUpdated.phone      = this.inputUpdateInfo.phone;
+      if (this.editField.occupation) onlyUpdated.occupation = this.inputUpdateInfo.occupation;
+      if (this.editField.bio)        onlyUpdated.bio        = this.inputUpdateInfo.bio;
+      if (this.editField.profileImg) onlyUpdated.profileImg = this.inputUpdateInfo.profileImg;
 
-      // usamos el spread operator "..." para planchar la data del form en el estado user
-      // , ademas incluyendo el id que recibimos por parametro de la ruta
-      const newUser = {
-        ...this.user,
-        ...this.inputUpdateInfo,
-        id: this.$route.params.id
-      };
+      const newUser = { ...this.user, ...onlyUpdated, id: this.$route.params.id };
 
-      const response = this.userService.updateUser(newUser);
-      response.then((data) => {
-        console.log('data', data)
-        const user = data;
-        this.$store.dispatch('updateUser', user);
-
-        this.clearInputUpdateInfo(); // limpamos el form luego de enviado
-        this.togglePopUp(); // cerramos el popap >.<
-      })
-      .catch((error) => {
-        console.error('Error al actualizar el usuario:', error);
-      });
-
+      this.userService.updateUser(newUser)
+          .then((data) => {
+            this.$store.dispatch('updateUser', data);
+            this.clearInputUpdateInfo();
+            this.togglePopUp();
+          })
+          .catch((e) => console.error('Error al actualizar el usuario:', e));
     },
-    async fetchUserTasks() {
-    // Reemplaza esto por tu servicio real
-    const allTasks = await fetchAllTaskDataByUserId(1,this.user.id);
-    this.tasks = allTasks;
-  },
-  goToProject(projectId) {
-  this.$router.push({ name: 'projectTodo', params: { id: projectId } });  }
 
+    async fetchUserTasks() {
+      // Reemplaza esto por tu servicio real
+      const allTasks = await fetchAllTaskDataByUserId(1,this.user.id);
+      this.tasks = allTasks;
+    },
+    goToProject(projectId) {
+      this.$router.push({ name: 'projectTodo', params: { id: projectId } });  },
+
+    async copyTeamCode() {
+      if (!this.teamCode) return;
+      try {
+        await navigator.clipboard.writeText(this.teamCode);
+        alert('Team Register Code copiado al portapapeles.');
+      } catch {
+        alert('No se pudo copiar el código.');
+      }
+    },
+    async shareTeamCode() {
+      if (!this.teamCode) return;
+      const text = `Join our organization in AidManager with this Team Register Code: ${this.teamCode}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Team Register Code', text });
+        } catch { /* user cancel */ }
+      } else {
+        // Fallback: copiar
+        await this.copyTeamCode();
+      }
+    }
   },
-  
+
   mounted() {
-  this.fetchUserTasks();
-}
+    this.fetchUserTasks();
+  }
 
 }
 
@@ -189,7 +243,7 @@ export default {
   <div class="content">
     <div class="profile-content flex">
       <form class="flex user-info form__update-profile" @submit.prevent="updateProfile">
-        <h2>{{user.firstName + " " + user.lastName}}'s profile:</h2>
+        <h2>{{ displayHeaderName }}'s profile:</h2>
 
         <p class="editable flex flex-col  gap-2">
           <strong>Full Name:</strong>
@@ -214,14 +268,34 @@ export default {
         </p>
 
         <p class="editable flex gap-2"><strong>ONG:</strong>
-        <span class="non-editable">{{ user.companyName}}</span>
+          <span class="non-editable">{{ user.companyName}}</span>
         </p>
+
+        <div v-if="isManager" class="editable">
+          <div class="team-code-row">
+            <strong>Team Code:</strong>
+            <span class="non-editable team-code-badge">{{ teamCode }}</span>
+          </div>
+
+          <div class="team-code-actions">
+            <button type="button" class="edit-button btn-inline" @click="copyTeamCode" aria-label="Copy team register code">
+              <i class="pi pi-copy icon-left"></i> Copy
+            </button>
+
+            <button type="button" class="edit-button btn-inline ml-2" @click="shareTeamCode" aria-label="Share team register code">
+              <i class="pi pi-share-alt icon-left"></i> Share
+            </button>
+          </div>
+
+          <small class="hint-text">
+            Share this code with your team so they can join your organization.
+          </small>
+        </div>
 
         <p class="editable flex gap-2"><strong>Phone: </strong>
           <span v-if="!editField['phone'] && user.phone === ''">No info to display</span>
           <span v-if="!editField['phone']">{{ user.phone}} </span>
-          <input v-else type="text" placeholder="Phone" v-model="inputUpdateInfo['phone']" >
-          <i v-if="!editField['phone'] && showPopUp" class="pi pi-pencil edit-icon" @click="toggleEditField('phone')"></i>
+          <input v-else type="text" inputmode="numeric" placeholder="Phone" :value="inputUpdateInfo.phone" maxlength="9" pattern="\d{9}" @input="validatePhone"/>          <i v-if="!editField['phone'] && showPopUp" class="pi pi-pencil edit-icon" @click="toggleEditField('phone')"></i>
         </p>
 
         <p class="editable flex gap-2"><strong>Occupation: </strong>
@@ -275,46 +349,46 @@ export default {
         <pv-button class="py-3 px-5" label="OK" @click="isFieldsEmpty = false"/>
       </div>
     </pv-dialog>
-<div class="container-for-task" v-if="this.$store.state.user.role !== 'Manager'">
-  <div class="user-tasks" style="margin-top: 2rem;">
-    <h1 style="margin-bottom: 1rem;">My Tasks</h1>
-    <!-- Filtros -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-      <select v-model="taskFilters.status" style="padding: 0.3rem; border-radius: 5px;">
-        <option value="">All Status</option>
-        <option value="Pendiente">Pendiente</option>
-        <option value="En progreso">En progreso</option>
-        <option value="Completada">Completada</option>
-      </select>
-      <input type="date" v-model="taskFilters.date" style="padding: 0.3rem; border-radius: 5px;" />
-    </div>
-    <!-- Lista de tareas -->
-    <div v-if="filteredTasks.length">
-      <div
-        v-for="task in filteredTasks"
-        :key="task.id"
-        class="task-card"
-        style="margin-bottom: 1rem; border-left: 4px solid #4CAF50; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor:pointer;"
-        @click="goToProject(task.projectId)"
-      >
-        <div class="title" style="display: flex; justify-content: space-between; align-items: center;">
-          <span class="task-title" style="font-weight: bold;">{{ task.title }}</span>
-          <span style="font-size: 0.9em; color: #888;">{{ task.status }}</span>
+    <div class="container-for-task" v-if="this.$store.state.user.role !== 'Manager'">
+      <div class="user-tasks" style="margin-top: 2rem;">
+        <h1 style="margin-bottom: 1rem;">My Tasks</h1>
+        <!-- Filtros -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+          <select v-model="taskFilters.status" style="padding: 0.3rem; border-radius: 5px;">
+            <option value="">All Status</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="En progreso">En progreso</option>
+            <option value="Completada">Completada</option>
+          </select>
+          <input type="date" v-model="taskFilters.date" style="padding: 0.3rem; border-radius: 5px;" />
         </div>
-        <div style="color: #555;">{{ task.description }}</div>
-        <div style="font-size: 0.9em; color: #888;">
-          Due: <i class="pi pi-calendar" style="color: #02513D; margin-right: 4px;"></i>{{ task.dueDate }}
+        <!-- Lista de tareas -->
+        <div v-if="filteredTasks.length">
+          <div
+              v-for="task in filteredTasks"
+              :key="task.id"
+              class="task-card"
+              style="margin-bottom: 1rem; border-left: 4px solid #4CAF50; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor:pointer;"
+              @click="goToProject(task.projectId)"
+          >
+            <div class="title" style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="task-title" style="font-weight: bold;">{{ task.title }}</span>
+              <span style="font-size: 0.9em; color: #888;">{{ task.status }}</span>
+            </div>
+            <div style="color: #555;">{{ task.description }}</div>
+            <div style="font-size: 0.9em; color: #888;">
+              Due: <i class="pi pi-calendar" style="color: #02513D; margin-right: 4px;"></i>{{ task.dueDate }}
+            </div>
+          </div>
         </div>
+        <div v-else style="color: #888;">No tasks found.</div>
       </div>
+
     </div>
-    <div v-else style="color: #888;">No tasks found.</div>
-  </div>
-
-</div>
 
   </div>
 
-<!-- Se agrega Experiment card feature-->
+  <!-- Se agrega Experiment card feature-->
 
 
 </template>
@@ -430,7 +504,7 @@ img {
     width: 100%;
     height: auto;
     flex-direction: column;
-  align-items: center;
+    align-items: center;
   }
   .user-info{
     width: 100%;
@@ -457,6 +531,54 @@ img {
   }
 }
 
+.team-code-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.team-code-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+  "Courier New", monospace;
+  background: #F3F4F6;
+  padding: .2rem .5rem;
+  border-radius: 6px;
+}
+
+.team-code-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-inline {
+  max-width: none;
+  margin-left: 0;
+  padding: 6px 12px;
+}
+
+.ml-2 {
+  margin-left: .5rem;
+}
+
+.icon-left {
+  margin-right: .4rem;
+}
+
+.hint-text {
+  display: block;
+  margin-top: .25rem;
+  color: #888;
+}
+
+@media (max-width: 640px) {
+  .team-code-row {
+    gap: .4rem;
+  }
+  .btn-inline {
+    padding: 6px 10px;
+  }
+}
 
 
 

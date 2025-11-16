@@ -1,51 +1,53 @@
 <script>
 import PostListHome from "@/components/home/post-list-home.component.vue";
-import {PostApiService} from "@/services/post.service.js";
+import { PostApiService } from "@/services/post.service.js";
 import PostEntity from "@/models/post.entity.js";
-import {User} from "@/models/user.entity.js";
 
 export default {
   name: "home-content",
-  components: {PostListHome},
+  components: { PostListHome },
   data() {
     return {
       posts: [],
       hasError: false,
       hasLoading: false,
-      postApi: new PostApiService()
-    }
+      errorMsg: "",
+      postApi: new PostApiService(),
+    };
   },
   computed: {
     user() {
       return this.$store.state.user;
     }
   },
-  created() {
-    this.fetchNewPosts();
+  async created() {
+    await this.fetchNewPosts();
   },
   methods: {
-
     formatDate(dateString) {
-      let date = new Date(dateString);
-      // Opciones para el formato de la fecha
-      let options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      };
-
-      return date.toLocaleString('en-US', options);
+      const date = new Date(dateString);
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
     },
 
-    buildPostListFromResponseData(items) {
-      console.log("Building post list from response data", items);
-      return items.data.map(item => {
-        console.log(item);
-        let formattedDate = this.formatDate(item.postTime);
+    buildPostListFromResponseData(payload) {
+      console.log("Building post list from response data", payload);
 
+      // Acepta array directo o { data: [...] }
+      const list = Array.isArray(payload)
+          ? payload
+          : (payload?.data ?? []);
+
+      if (!Array.isArray(list)) return [];
+
+      return list.map((item) => {
+        const formattedDate = this.formatDate(item.postTime);
         return new PostEntity(
             item.id,
             item.title,
@@ -57,25 +59,34 @@ export default {
             item.userImage,
             item.companyId,
             formattedDate,
-            item.rating,
-            item.images = [],
-            item.commentsList = []
-        )
-      })
+            item.rating ?? 0,
+            Array.isArray(item.images) ? item.images : [],
+            Array.isArray(item.commentsList) ? item.commentsList : []
+        );
+      });
     },
 
-    fetchNewPosts() {
-      this.postApi.getAllPostsByCompanyId(this.user.companyId)
-          .then(response => {
-            let items = response; // ausmiendo que es un array de objetos de tipo PostEntity
-            this.posts = this.buildPostListFromResponseData(items);
-            console.log("posts adquired:" + this.posts.length);
-            
-          });
-    }
+    async fetchNewPosts() {
+      try {
+        this.hasLoading = true;
+        this.hasError = false;
 
-  }
-}
+        // getAllPostsByCompanyId DEBE devolver res.data (un array)
+        const items = await this.postApi.getAllPostsByCompanyId(this.user.companyId, 5);
+
+        this.posts = this.buildPostListFromResponseData(items);
+        console.log("posts acquired:", this.posts.length);
+      } catch (e) {
+        this.hasError = true;
+        this.errorMsg = e?.response?.data?.title || "Error cargando publicaciones";
+        console.error("No se pudieron obtener posts", e?.response?.data || e);
+        this.posts = [];
+      } finally {
+        this.hasLoading = false;
+      }
+    },
+  },
+};
 </script>
 
 <template>
@@ -84,9 +95,13 @@ export default {
       <img class="home-hero-image border-round-xl" src="../../assets/home-hero.png"/>
     </div>
     <h2 class="home-title text-xl font-normal my-4">New posts:</h2>
-    <post-list-home :posts="posts"></post-list-home>
+
+    <p v-if="hasLoading">Cargando publicaciones…</p>
+    <p v-else-if="hasError">{{ errorMsg }}</p>
+    <post-list-home v-else :posts="posts"></post-list-home>
   </section>
 </template>
+
 
 <style scoped>
 
