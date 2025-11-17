@@ -18,13 +18,13 @@ export default {
   <div class="subscription-container min-h-screen h-full flex flex-column align-items-center gap-5">
     <div class="subscription-box flex flex-column gap-6 py-5">
       <div class="logo-container flex">
-        <img src="../../assets/logoAidManager.png" alt="logo"/>
-        <span class="font-bold text-4xl">AidManager</span>
+        <img src="../../assets/ManageWise_logo.png" alt="logo" style="width: 100px; height: auto;" />
+        <span class="font-bold text-4xl">ManageWise</span>
       </div>
       <div class="card flex">
 
         <div class="card-header">
-          <span class="title font-bold text-3xl" style="color: #02513D;">S/.300.00</span>
+          <span class="title font-bold text-3xl" style="color: #FA8224;">S/.300.00</span>
           <p class="subtitle">/year for you & your team</p>
         </div>
 
@@ -60,7 +60,7 @@ export default {
 
 <style scoped>
 .subscription-container {
-  background-color: #E6F4E2;
+  background-color: #F9F5EF;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
@@ -106,14 +106,14 @@ li {
 .button {
   width: 30%;
   align-self: center;
-  background-color: #02513D;
+  background-color: #FA8224;
   border: none;
   border-radius: 30px;
   cursor: pointer;
 }
 
 .button:hover {
-  background-color: #024030;
+  background-color: #d16716ff;
 }
 
 .subscription-list {

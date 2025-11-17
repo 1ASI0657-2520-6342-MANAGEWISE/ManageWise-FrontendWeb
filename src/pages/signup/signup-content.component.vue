@@ -124,8 +124,8 @@ export default {
 <template>
   <div class="signup-container min-h-screen flex">
     <div class="logo-container flex">
-      <img src="../../assets/logoAidManager.png" alt="logo" />
-      <span class="font-bold text-4xl">AidManager</span>
+      <img src="../../assets/ManageWise_logo.png" alt="logo" style="width: 100px; height: auto;" />
+      <span class="font-bold text-4xl">ManageWise</span>
     </div>
     <div class="card flex">
       <span class="title font-normal" style="font-size:1rem">Transform your fundraising efforts with precision
@@ -242,7 +242,7 @@ export default {
 }
 
 .signup-container {
-  background-color: #E6F4E2;
+  background-color: #F9F5EF;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
@@ -304,21 +304,21 @@ export default {
 .button {
   width: 40%;
   align-self: center;
-  background-color: #02513D;
+  background-color: #FA8224;
   border: none;
   border-radius: 30px;
   cursor: pointer;
 }
 
 .button:hover {
-  background-color: #024030;
+  background-color: #d16716ff;
 }
 
 .link {
   width: 90%;
   align-self: center;
   text-align: right;
-  color: #02513D;
+  color: #FA8224;
   text-decoration: none;
 }
 
@@ -354,7 +354,7 @@ export default {
 }
 
 .radio-input:checked {
-  border: 8px solid #02513D;
+  border: 8px solid #FA8224;
 }
 
 .confirm-password-field {

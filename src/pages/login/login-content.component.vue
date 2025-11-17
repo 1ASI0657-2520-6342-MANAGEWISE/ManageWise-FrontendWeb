@@ -150,12 +150,12 @@ export default {
 <template>
   <div class="login-container h-screen flex">
     <div class="logo-container flex">
-      <img src="../../assets/logoAidManager.png" alt="logo" />
-      <span class="font-bold text-3xl">AidManager</span>
+      <img src="../../assets/ManageWise_logo.png" alt="logo" style="width: 100px; height: auto;" />
+      <span class="font-bold text-3xl">ManageWise</span>
     </div>
 
     <div class="card flex">
-      <span class="title font-normal text-xl" style="color: #02513D;">Welcome!</span>
+      <span class="title font-normal text-xl" style="color: #FA8224;">Welcome!</span>
 
       <form class="flex flex-column gap-3" @submit.prevent="handleSubmitLogin">
         <input
@@ -181,7 +181,7 @@ export default {
           ></i>
         </div>
 
-        <a class="link" href="#" style="color: #02513D; font-style: italic; font-size: 0.8rem;">
+        <a class="link" href="#" style="color: #FA8224; font-style: italic; font-size: 0.8rem;">
           Forgot your password?
         </a>
 
@@ -196,7 +196,7 @@ export default {
     </div>
 
     <h3 class="card-footer">
-      New to AidManager?
+      New to ManageWise?
       <router-link to="/register" class="link" style="font-weight: 600">Join now</router-link>
     </h3>
 
@@ -213,7 +213,7 @@ export default {
 
 <style scoped>
 .login-container {
-  background-color: #E6F4E2;
+  background-color: #F9F5EF;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
@@ -250,17 +250,17 @@ export default {
 .button {
   width: 40%;
   align-self: center;
-  background-color: #02513D;
+  background-color: #FA8224;
   border: none;
   border-radius: 30px;
   cursor: pointer;
 }
-.button:hover { background-color: #024030; }
+.button:hover { background-color: #d16716ff; }
 .link {
   width: 90%;
   align-self: center;
   text-align: right;
-  color: #02513D;
+  color: #FA8224;
   text-decoration: none;
 }
 .card-footer { font-weight: normal; font-size: 1rem; }

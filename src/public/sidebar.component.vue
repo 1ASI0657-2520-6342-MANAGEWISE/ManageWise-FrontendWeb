@@ -187,7 +187,7 @@ aside {
 
 li > p {
   letter-spacing: .5px;
-  color: #02513D;
+  color: #FA8224;
 }
 
 li {

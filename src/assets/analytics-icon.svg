@@ -1,3 +1,7 @@
-<svg width="24" height="19" viewBox="0 0 24 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M23.76 16.1617H0.24C0.108 16.1617 0 16.2697 0 16.4017V18.0817C0 18.2137 0.108 18.3217 0.24 18.3217H23.76C23.892 18.3217 24 18.2137 24 18.0817V16.4017C24 16.2697 23.892 16.1617 23.76 16.1617ZM1.611 12.4057L2.802 13.5907C2.895 13.6837 3.048 13.6837 3.141 13.5907L10.182 6.57372L13.11 9.49272C13.2904 9.67145 13.5341 9.77172 13.788 9.77172C14.0419 9.77172 14.2856 9.67145 14.466 9.49272L22.392 1.59672C22.485 1.50372 22.485 1.35072 22.392 1.25772L21.201 0.0697201C21.1559 0.0250555 21.095 0 21.0315 0C20.968 0 20.9071 0.0250555 20.862 0.0697201L13.791 7.11972L10.86 4.20072C10.6796 4.02199 10.4359 3.92172 10.182 3.92172C9.92806 3.92172 9.68439 4.02199 9.504 4.20072L1.611 12.0667C1.58856 12.0889 1.57074 12.1153 1.55858 12.1444C1.54642 12.1735 1.54016 12.2047 1.54016 12.2362C1.54016 12.2678 1.54642 12.299 1.55858 12.3281C1.57074 12.3572 1.58856 12.3836 1.611 12.4057Z" fill="#02513D"/>
-</svg>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg width="64px" height="64px" viewBox="0 0 24.00 24.00" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000">
+<g id="SVGRepo_bgCarrier" stroke-width="0"/>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.24000000000000005"/>
+<g id="SVGRepo_iconCarrier"> <path d="M3 3V21" stroke="#FA8224" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/> <path d="M21 21H3" stroke="#FA8224" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7 16L12.25 10.75L15.75 14.25L21 9" stroke="#FA8224" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/> </g>
+</svg>

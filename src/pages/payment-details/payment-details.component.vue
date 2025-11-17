@@ -98,8 +98,8 @@ export default {
 <template>
   <div class="payment-details-container h-screen flex">
     <div class="logo-container flex">
-      <img src="../../assets/logoAidManager.png" alt="logo"/>
-      <span class="font-bold text-4xl">AidManager</span>
+      <img src="../../assets/ManageWise_logo.png" alt="logo" style="width: 100px; height: auto;" />
+      <span class="font-bold text-4xl">ManageWise</span>
     </div>
     <div class="card flex gap-3">
 
@@ -154,7 +154,7 @@ export default {
 
 <style scoped>
 .payment-details-container {
-  background-color: #E6F4E2;
+  background-color: #F9F5EF;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
@@ -209,14 +209,14 @@ export default {
 .button {
   width: 40%;
   align-self: center;
-  background-color: #02513D;
+  background-color: #FA8224;
   border: none;
   border-radius: 30px;
   cursor: pointer;
 }
 
 .button:hover {
-  background-color: #024030;
+  background-color: #d16716ff;
 }
 
 
