@@ -206,7 +206,7 @@ const handleTaskMoved = (updatedTask) => {
 }
 .subtitle {
   font-family: 'Lora', serif;
-  color: #02513D;
+  color: #FA8224;
   font-weight: 700;
   font-size: 1.35rem;
   margin: 0;
@@ -240,7 +240,7 @@ const handleTaskMoved = (updatedTask) => {
   font-family: 'Lora', serif !important;
   font-weight: 700 !important;
   letter-spacing: 1px;
-  color: #02513D;
+  color: #FA8224;
   font-size: 2.2rem;
   margin-bottom: 0.2rem;
 }
@@ -264,7 +264,7 @@ const handleTaskMoved = (updatedTask) => {
   gap: 0.4rem;
 }
 .add-task.modern {
-  background: linear-gradient(90deg, #02513D 60%, #038c5a 100%);
+  background: linear-gradient(135deg, #FA8224, #606e9bff);
   color: #fff;
   border-radius: 0.8rem;
   font-weight: 700;
@@ -278,7 +278,7 @@ const handleTaskMoved = (updatedTask) => {
   align-items: center;
 }
 .add-task.modern:hover, .add-task.modern:focus {
-  background: linear-gradient(90deg, #038c5a 60%, #02513D 100%);
+  background: linear-gradient(135deg, #c46116ff, #475583ff);
   box-shadow: 0 4px 16px 0 rgba(2,81,61,0.13);
 }
 .columns-board {
@@ -307,7 +307,7 @@ const handleTaskMoved = (updatedTask) => {
 .loader-modern {
   text-align: center;
   margin: 2.5rem 0;
-  color: #02513D;
+  color: #cf844aff;
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 0.5px;
