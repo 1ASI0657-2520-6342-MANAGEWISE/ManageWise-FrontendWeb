@@ -320,7 +320,7 @@ export default {
 <style scoped>
 .title-projects {
   font-family: 'Lora', serif;
-  color: #02513D;
+  color: #FA8224;
   font-weight: 600 !important;
   letter-spacing: 1.05px;
   margin-bottom: 16px;
@@ -340,12 +340,12 @@ export default {
 .calendar-title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #6b8e23;
+  color: #FA8224;
   margin: 0 0 0.5rem 0;
 }
 
 .calendar-subtitle {
-  color: #6b8e23;
+  color: #d46f22ff;
   opacity: 0.7;
   margin: 0;
   font-size: 1.1rem;
@@ -470,13 +470,13 @@ export default {
 }
 
 .calendar-day.selected {
-  background: #6b8e23;
+  background: #FA8224;
   color: white;
   font-weight: 600;
 }
 
 .calendar-day.today {
-  background: #10b981;
+  background: #f7a15fff;
   color: white;
   font-weight: 600;
 }
@@ -518,7 +518,7 @@ export default {
 }
 
 .selected-date-card {
-  background: linear-gradient(135deg, #57ad3d, #acd852);
+  background: linear-gradient(135deg, #FA8224, #606e9bff);
   border-radius: 1rem;
   padding: 1.5rem;
   color: white;

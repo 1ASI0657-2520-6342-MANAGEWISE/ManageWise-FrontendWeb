@@ -118,7 +118,7 @@ export default {
 .newpost-title {
   font-family: 'Lora', serif !important;
   font-weight: 600 !important;
-  color: #02513D;
+  color: #FA8224;
 }
 
 .error-modal h1, p {
@@ -143,7 +143,7 @@ export default {
 }
 
 .post-container > h2 {
-  color: #008A66;
+  color: #eca46cff;
 }
 
 .post-container input:focus, textarea:focus {
@@ -162,7 +162,7 @@ export default {
 }
 
 .post-button-container > button[type="submit"] {
-  background-color: #008A66;
+  background-color: #FA8224;
 }
 
 .post-button-container > button {

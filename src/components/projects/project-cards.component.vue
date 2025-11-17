@@ -208,7 +208,7 @@ const createProject = async () => {
 <style scoped>
 .title-projects {
   font-family: 'Lora', serif;
-  color: #02513D;
+  color: #FA8224;
   font-weight: 600 !important;
   letter-spacing: 1.05px;
 }
@@ -235,14 +235,14 @@ const createProject = async () => {
   width: 100%;
   height: 12rem;
   object-fit: cover;
-  background-color: rgba(2, 81, 61, 0.4);
-  color: #02513D;
+  background-color: rgba(236, 188, 132, 0.4);
+  color: #FA8224;
   font-size: 6vh;
   font-weight: lighter;
   transition: background 0.2s, color 0.2s;
 }
 .addBut:focus {
-  outline: 2px solid #02513D;
+  outline: 2px solid #FA8224;
   background: #e6f4f1;
 }
 .error-list {
@@ -261,13 +261,13 @@ const createProject = async () => {
 }
 .title {
   font-family: 'Lora', serif;
-  color: #02513D;
+  color: #FA8224;
   font-weight: 600 !important;
 }
 .subtitle {
   font-family: 'Lora', serif;
   font-size: 2vh;
-  color: #02513D;
+  color: #FA8224;
   font-weight: bold;
 }
 .modern-dialog .p-dialog-content {
@@ -284,7 +284,7 @@ const createProject = async () => {
 }
 .dialog-title {
   font-family: 'Lora', serif;
-  color: #02513D;
+  color: #FA8224;
   font-size: 2.1rem;
   font-weight: 700;
   margin-bottom: 0.2rem;
@@ -303,7 +303,7 @@ const createProject = async () => {
 }
 .form-label {
   font-weight: 600;
-  color: #02513D;
+  color: #FA8224;
   margin-bottom: 0.1rem;
   font-size: 1rem;
 }
@@ -317,8 +317,8 @@ const createProject = async () => {
   outline: none;
 }
 .form-input:focus {
-  border: 1.5px solid #02513D;
-  box-shadow: 0 0 0 2px #c7f5e7;
+  border: 1.5px solid #FA8224;
+  box-shadow: 0 0 0 2px #f7cc9cff;
 }
 .textarea {
   min-height: 90px;
@@ -330,7 +330,7 @@ const createProject = async () => {
   margin-top: 1.2rem;
 }
 .add-btn {
-  background-color: #02513D !important;
+  background-color: #FA8224 !important;
   color: #fff !important;
   border-radius: 10px !important;
   font-size: 1.1rem !important;
@@ -340,7 +340,7 @@ const createProject = async () => {
   transition: background 0.18s, box-shadow 0.18s;
 }
 .add-btn:hover, .add-btn:focus {
-  background: #03795a !important;
+  background: #d16716ff !important;
   box-shadow: 0 4px 16px 0 rgba(2,81,61,0.13);
 }
 </style>
