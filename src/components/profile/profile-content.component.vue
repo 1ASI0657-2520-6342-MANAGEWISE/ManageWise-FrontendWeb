@@ -2,9 +2,11 @@
 import {UserService} from "@/services/user.service.js";
 import {mapState} from "vuex";
 import {fetchAllTaskDataByUserId} from "@/services/projects-api.services.js";
+import Toast from 'primevue/toast'; // Importar Toast
 
 export default {
   name: "ProfileContent",
+  components: { Toast },
   computed: {
     user() {
       return this.$store.state.user || {};
@@ -155,7 +157,6 @@ export default {
     },
 
     async updateProfile() {
-      // Validación: solo valida campos que sí estén en edición
       if (this.editField.fullName) {
         if (!this.inputUpdateInfo.firstName?.trim() || !this.inputUpdateInfo.lastName?.trim()) {
           this.isFieldsEmpty = true; return;
@@ -219,9 +220,9 @@ export default {
       if (!this.teamCode) return;
       try {
         await navigator.clipboard.writeText(this.teamCode);
-        alert('Team Register Code copiado al portapapeles.');
+        this.$toast.add({ severity: 'success', summary: 'Copied', detail: 'Team Code copied to clipboard', life: 3000 });
       } catch {
-        alert('No se pudo copiar el código.');
+        this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Could not copy code', life: 3000 });
       }
     },
     async shareTeamCode() {
@@ -251,6 +252,7 @@ export default {
 
 <template>
   <div class="content">
+    <Toast />
     <div class="profile-content flex">
       <form class="flex user-info form__update-profile" @submit.prevent="updateProfile">
         <h2>{{ displayHeaderName }}'s profile:</h2>
@@ -356,7 +358,6 @@ export default {
         <pv-button class="py-3 px-5" label="OK" @click="isFieldsEmpty = false"/>
       </div>
     </pv-dialog>
-
     <div class="container-for-task">
       <div class="user-tasks" style="margin-top: 2rem;">
         <h1 style="margin-bottom: 1rem;">My Tasks</h1>
@@ -587,5 +588,4 @@ img {
     padding: 6px 10px;
   }
 }
-
 </style>
