@@ -1,16 +1,14 @@
 <script setup>
-import { ref, onMounted,computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import columnC from './column.component.vue'
 import { fetchTaskData, addTask } from '@/services/projects-api.services.js'
 import { TaskEntity } from '@/models/task.entity.js'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import { useStore } from 'vuex'
-import { UserService } from '@/services/user.service'
 import TeamMembersService from '@/services/team-members.service'
 
 const props = defineProps({
@@ -19,6 +17,7 @@ const props = defineProps({
     required: true,
   },
 })
+
 const store = useStore()
 const userRole = computed(() => store.state.user?.role || '')
 const isTeamMember = computed(() => userRole.value === 'TeamMember')
@@ -30,7 +29,7 @@ const allTasks = ref([])
 const loading = ref(false)
 const visible = ref(false)
 const newTask = ref(new TaskEntity())
-const teamMembers = ref([])
+const teamMembers = ref([])   // <--- importante
 const project = computed(() => store.state.selectedProject)
 
 const fetchTasks = async () => {
@@ -42,7 +41,6 @@ const fetchTasks = async () => {
 const emit = defineEmits(['updAll'])
 
 const handleUpdateAll = () => {
-  // Solo recargar tareas si es estrictamente necesario (por ejemplo, tras crear/eliminar una tarea)
   fetchTasks()
 }
 
@@ -52,26 +50,27 @@ onMounted(async () => {
 })
 
 const fetchTeamMembers = async () => {
+  try {
+    const members = await teamMembersService.getMembers(store.state.user.companyId)
+    console.log('fetchTeamMembers members:', members)
 
-  await teamMembersService.getMembers(store.state.user.companyId)
-    .then(response => {
-      if (response && response.data) {
-        teamMembers.value = response.data.map(member => ({
-          id: member.id,
-          name: member.name
-        }))
-      } else {
-        console.error('Error fetching team members:', response)
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching team members:', error)
-    })
+    if (Array.isArray(members)) {
+      teamMembers.value = members.map(member => ({
+        id: member.id,
+        name: member.name
+      }))
+    } else {
+      console.error('TeamMembers NO es un array:', members)
+      teamMembers.value = []
+    }
+  } catch (error) {
+    console.error('Error fetching team members:', error)
+    teamMembers.value = []
+  }
 }
 
-const getTasksByState = (state) => {
-  return allTasks.value.filter(task => task.state === state)
-}
+const getTasksByState = (state) =>
+    allTasks.value.filter(task => task.state === state)
 
 const addsTask = () => {
   visible.value = true
@@ -100,84 +99,58 @@ const createTask = async (stateColumn) => {
   }
 }
 
-const handleTaskMoved = (updatedTask) => {
-  // Actualiza el estado local de las tareas sin recargar todo
-  const prevState = allTasks.value.find(t => t.id === updatedTask.id)?.state;
-  if (prevState && prevState !== updatedTask.state) {
-    // Quita la tarea del array y la vuelve a agregar actualizada (nuevo array para reactividad)
-    allTasks.value = [...allTasks.value.filter(t => t.id !== updatedTask.id), { ...updatedTask }];
-  } else {
-    // Solo actualiza la tarea si no cambió de columna
-    allTasks.value = allTasks.value.map(t => t.id === updatedTask.id ? { ...t, ...updatedTask } : t);
-  }
-};
 
+const handleTaskMoved = (updatedTask) => {
+  allTasks.value = allTasks.value.map(t =>
+      t.id === updatedTask.id ? { ...t, ...updatedTask } : t
+  )
+}
 </script>
 
 <template>
   <section class="board-bg">
     <div class="board-container">
-      <header class="board-header">
-        <div v-if="project" class="project-summary-card modern">
-          <img v-if="project.imageUrl && project.imageUrl[0]" :src="project.imageUrl[0]" alt="Project image" class="project-summary-img" />
-          <div class="project-summary-info">
-            <h1 class="title-projects">{{ project.name }}</h1>
-            <p class="project-summary-desc">{{ project.description }}</p>
-            <div class="project-summary-meta">
-              <span v-if="project.projectDate" class="meta-item"><i class="pi pi-calendar"></i> {{ project.projectDate }}</span>
-              <span v-if="project.projectLocation" class="meta-item"><i class="pi pi-map-marker"></i> {{ project.projectLocation }}</span>
-              <span v-if="project.audit" class="meta-item"><i class="pi pi-clock"></i> Audit: {{ project.audit }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="board-header-actions">
-          <h3 class="subtitle">Tareas asignadas</h3>
-          <Button v-if="!isTeamMember" class="add-task modern" @click="addsTask">
-            <i class="pi pi-plus-circle" style="margin-right:0.5rem;"></i> Nueva tarea
-          </Button>
-        </div>
-      </header>
+
       <Dialog modal:true class="p-dialog" v-model:visible="visible" :closeOnOutsideClick="true">
-        <form class="modern-task-dialog flex-dialog" @submit.prevent="() => createTask('To-Do')" autocomplete="off">
-          <div class="dialog-header">
-            <span class="dialog-icon"><i class="pi pi-plus-circle"></i></span>
-            <div>
-              <h2 class="dialog-title">Add New Task</h2>
-              <p class="dialog-sub">Fill in the details below to create a new task.</p>
-            </div>
-          </div>
-          <div class="dialog-fields">
-            <div class="dialog-field">
-              <label for="title" class="dialog-label">Title</label>
-              <InputText id="title" class="dialog-input" autocomplete="off" v-model="newTask.title" placeholder="Task title" required aria-required="true"/>
-            </div>
-            <div class="dialog-field">
-              <label for="description" class="dialog-label">Description</label>
-              <InputText id="description" class="dialog-input" autocomplete="off" v-model="newTask.description" placeholder="Task description" required aria-required="true"/>
-            </div>
-            <div class="dialog-field">
-              <label for="assigned" class="dialog-label">Employee Assigned</label>
-              <Dropdown id="assigned" class="dialog-input" v-model="newTask.assignedID" :options="teamMembers" optionLabel="name" optionValue="id" placeholder="Select employee" required aria-required="true"/>
-            </div>
-            <div class="dialog-field">
-              <label for="calendar" class="dialog-label">Due date</label>
-              <Calendar id="due" v-model="newTask.due" :minDate="new Date()" :manualInput="false" class="dialog-input" placeholder="Select date" required aria-required="true"/>
-            </div>
-          </div>
-          <div class="dialog-actions">
-            <Button label="Add Task" type="submit" class="dialog-add-btn"/>
-          </div>
-        </form>
       </Dialog>
+
       <div v-if="loading" class="loader-modern">Cargando tareas...</div>
       <main v-else class="columns-board">
-        <columnC class="column-card" :tasks="getTasksByState('To-Do')" taskColumn="To-Do" :id="props.id" @updAll="handleUpdateAll" :reload="reload" @taskMoved="handleTaskMoved"/>
-        <columnC class="column-card" :tasks="getTasksByState('Doing')" taskColumn="Doing" :id="props.id" @updAll="handleUpdateAll" :reload="reload" @taskMoved="handleTaskMoved"/>
-        <columnC class="column-card" :tasks="getTasksByState('Done')" taskColumn="Done" :id="props.id" @updAll="handleUpdateAll" :reload="reload" @taskMoved="handleTaskMoved"/>
+        <columnC
+            class="column-card"
+            :tasks="getTasksByState('To-Do')"
+            taskColumn="To-Do"
+            :id="props.id"
+            :reload="reload"
+            :teamMembers="teamMembers"
+            @updAll="handleUpdateAll"
+            @taskMoved="handleTaskMoved"
+        />
+        <columnC
+            class="column-card"
+            :tasks="getTasksByState('Doing')"
+            taskColumn="Doing"
+            :id="props.id"
+            :reload="reload"
+            :teamMembers="teamMembers"
+            @updAll="handleUpdateAll"
+            @taskMoved="handleTaskMoved"
+        />
+        <columnC
+            class="column-card"
+            :tasks="getTasksByState('Done')"
+            taskColumn="Done"
+            :id="props.id"
+            :reload="reload"
+            :teamMembers="teamMembers"
+            @updAll="handleUpdateAll"
+            @taskMoved="handleTaskMoved"
+        />
       </main>
     </div>
   </section>
 </template>
+
 
 <style scoped>
 .board-bg {
@@ -277,7 +250,8 @@ const handleTaskMoved = (updatedTask) => {
   display: flex;
   align-items: center;
 }
-.add-task.modern:hover, .add-task.modern:focus {
+.add-task.modern:hover,
+.add-task.modern:focus {
   background: linear-gradient(135deg, #c46116ff, #475583ff);
   box-shadow: 0 4px 16px 0 rgba(2,81,61,0.13);
 }

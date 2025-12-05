@@ -199,10 +199,20 @@ export default {
           .catch((e) => console.error('Error al actualizar el usuario:', e));
     },
 
+    // En methods:
     async fetchUserTasks() {
-      // Reemplaza esto por tu servicio real
-      const allTasks = await fetchAllTaskDataByUserId(1,this.user.id);
-      this.tasks = allTasks;
+      if (!this.user || !this.user.id) {
+        console.warn("Esperando datos de usuario para cargar tareas...");
+        return;
+      }
+
+      try {
+        const allTasks = await fetchAllTaskDataByUserId(1, this.user.id);
+        this.tasks = allTasks;
+      } catch (error) {
+        console.error("Error cargando tareas:", error);
+        this.tasks = [];
+      }
     },
     goToProject(projectId) {
       this.$router.push({ name: 'projectTodo', params: { id: projectId } });  },
@@ -230,8 +240,12 @@ export default {
     }
   },
 
-  mounted() {
-    this.fetchUserTasks();
+  async mounted() {
+    try {
+      await this.fetchUserTasks();
+    } catch (e) {
+      console.log("El módulo de tareas falló, pero mostramos el perfil igual.");
+    }
   }
 
 }

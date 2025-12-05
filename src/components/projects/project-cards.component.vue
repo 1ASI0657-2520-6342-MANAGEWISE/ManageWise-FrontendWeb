@@ -1,48 +1,48 @@
 <template>
   <section class="flex h-full flex-column p-3 lg:p-5 lg:pb-0 widthsec">
+    <Toast />
+
     <h1 class="title-projects text-4xl font-medium">Projects</h1>
     <br>
     <h3 class="subtitle font-medium">Current Projects:</h3>
     <div class="all">
       <div class="project-cards">
-        <!-- Paginador visual -->
         <Paginator
-          :rows="pageSize"
-          :totalRecords="projects.length"
-          :first="first"
-          @page="onPageChange"
-          class=" w-full"
-          template="PrevPageLink PageLinks NextPageLink"
+            :rows="pageSize"
+            :totalRecords="projects.length"
+            :first="first"
+            @page="onPageChange"
+            class=" w-full"
+            template="PrevPageLink PageLinks NextPageLink"
         />
-        <!-- Mostrar proyectos paginados con el componente CardsComponent -->
+
         <cards-component v-for="(project, index) in paginatedProjects" :key="project.id || index" :project="project"/>
 
-        <!-- Botón para agregar un nuevo proyecto -->
         <div class="add-project">
           <Button label="+" class="addBut" @click="showAddProjectDialog" aria-label="Add new project"/>
         </div>
 
-        <!-- Diálogo para agregar un nuevo proyecto -->
-        <Dialog 
-          modal 
-          class="p-dialog modern-dialog" 
-          v-model:visible="visible" 
-          :closable="true"
-          :dismissableMask="true"
-          @hide="onDialogHide"
-          :aria-modal="true"
-          aria-labelledby="add-project-title"
+        <Dialog
+            modal
+            class="p-dialog modern-dialog"
+            v-model:visible="visible"
+            :closable="true"
+            :dismissableMask="true"
+            @hide="onDialogHide"
+            :aria-modal="true"
+            aria-labelledby="add-project-title"
         >
           <div class="dialog-content">
             <h2 id="add-project-title" class="dialog-title">Add your project</h2>
             <span class="dialog-subtitle">Add your project info.</span>
+
             <div v-if="Errors.length" class="error-list mb-3">
               <b>Please correct the following error(s):</b>
               <ul>
                 <li v-for="error in Errors" :key="error">{{ error }}</li>
               </ul>
             </div>
-            <!-- Campos para ingresar información del nuevo proyecto -->
+
             <div class="form-group">
               <label for="name" class="form-label">Name</label>
               <InputText id="name" ref="nameInput" class="form-input" autocomplete="off" v-model="newProject.name" aria-required="true" placeholder="Project name"/>
@@ -56,7 +56,7 @@
               <textarea id="description" class="form-input textarea" autocomplete="off" v-model="newProject.description" rows="4"
                         cols="50" name="description-area" aria-required="true" placeholder="Describe your project..."/>
             </div>
-            <!-- Botón para agregar el nuevo proyecto -->
+
             <div class="dialog-actions">
               <Button type="submit" label="Add" @click="checkForm" class="add-btn"/>
             </div>
@@ -68,24 +68,25 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted, watch, nextTick} from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Paginator from 'primevue/paginator';
+import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
 import CardsComponent from '@/components/projects/card.component.vue';
-import {ProjectsEntity} from "@/models/projects.entity.js";
-import {fetchProjects, addProject} from "@/services/projects-api.services.js";
+import { fetchProjects, addProject } from "@/services/projects-api.services.js";
 
+const toast = useToast();
 const visible = ref(false);
 const projects = ref([]);
 const newProject = ref({ name: '', image: '', description: '' });
 const Errors = ref([]);
 const nameInput = ref(null);
 
-// Paginación
-const pageSize = 6; // Proyectos por página
-const first = ref(0); // Índice del primer proyecto en la página actual
+const pageSize = 6;
+const first = ref(0);
 const paginatedProjects = computed(() => {
   return projects.value.slice(first.value, first.value + pageSize);
 });
@@ -93,11 +94,9 @@ const onPageChange = (event) => {
   first.value = event.first;
 };
 
-// Persistencia del estado del diálogo y del formulario
 const DIALOG_KEY = 'addProjectDialogOpen';
 const FORM_KEY = 'addProjectFormData';
 
-// Restaurar estado del diálogo y formulario si corresponde
 onMounted(() => {
   const dialogOpen = localStorage.getItem(DIALOG_KEY);
   if (dialogOpen === 'true') {
@@ -107,16 +106,13 @@ onMounted(() => {
       Object.assign(newProject.value, JSON.parse(savedForm));
     }
   }
-  // get the user of local storage
   const user = JSON.parse(localStorage.getItem('user'));
   getProjects(user?.companyId);
 });
 
-// Persistir estado del diálogo y formulario
 watch(visible, (val) => {
   localStorage.setItem(DIALOG_KEY, val ? 'true' : 'false');
   if (val) {
-    // Focus automático al abrir
     nextTick(() => {
       nameInput.value?.$el?.focus?.();
     });
@@ -145,7 +141,6 @@ const getProjects = (companyId) => {
   fetchProjects(companyId)
       .then(data => {
         projects.value = data;
-        // Reiniciar paginación si hay menos proyectos en la nueva lista
         if (first.value >= data.length) {
           first.value = 0;
         }
@@ -160,7 +155,6 @@ const showAddProjectDialog = () => {
 };
 
 const onDialogHide = () => {
-  // Limpiar solo si se agregó correctamente o el usuario cierra manualmente
   clearForm();
 };
 
@@ -178,6 +172,7 @@ const createProject = async () => {
     return;
   }
   const user = ref(JSON.parse(localStorage.getItem('user')));
+
   try {
     const now = new Date();
     const projectData = {
@@ -189,17 +184,25 @@ const createProject = async () => {
       projectTime: now.toTimeString().split(' ')[0],
       projectLocation: 'Lima, Peru',
     };
+
     const addedProject = await addProject(projectData);
+
     projects.value.push({
       id: addedProject.id,
       name: addedProject.name,
-      image: addedProject.image,
+      imageUrl: addedProject.imageUrl,
       description: addedProject.description,
+      projectDate: addedProject.projectDate,
+      projectLocation: addedProject.projectLocation
     });
+
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Project Created Successfully', life: 3000 });
+
     clearForm();
     visible.value = false;
   } catch (error) {
     console.error('Error al agregar el proyecto:', error);
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Could not create project', life: 3000 });
     Errors.value = ['Error adding project. Please try again.'];
   }
 };

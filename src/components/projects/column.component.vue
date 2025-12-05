@@ -3,12 +3,10 @@ import { ref, computed } from 'vue'
 import Card from 'primevue/card'
 import Task from './task.component.vue'
 import Button from 'primevue/button'
-import Divider from 'primevue/divider'
 import { addTask } from '@/services/projects-api.services.js'
 import { TaskEntity } from '@/models/task.entity.js'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import Calendar from "primevue/calendar"
 import { useStore } from 'vuex'
 
@@ -17,11 +15,11 @@ const userRole = computed(() => store.state.user?.role || '')
 const isTeamMember = computed(() => userRole.value === 'TeamMember')
 
 const state = ref({
-  newTask: ref(new TaskEntity()),
+  newTask: new TaskEntity(),
 })
 
 const visible = ref(false)
-const emits = defineEmits(['updAll'])
+const emits = defineEmits(['updAll', 'taskMoved'])
 
 const props = defineProps({
   id: {
@@ -40,18 +38,22 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  teamMembers: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 function cambiarColor(taskColumn) {
   switch (taskColumn) {
     case 'To-Do':
-      return 'linear-gradient(135deg, #f8fafc 0%, #ffe5e5 100%)';
+      return 'linear-gradient(135deg, #f8fafc 0%, #ffe5e5 100%)'
     case 'Doing':
-      return 'linear-gradient(135deg, #f8fafc 0%, #fff7e5 100%)';
+      return 'linear-gradient(135deg, #f8fafc 0%, #fff7e5 100%)'
     case 'Done':
-      return 'linear-gradient(135deg, #f8fafc 0%, #e5f7ff 100%)';
+      return 'linear-gradient(135deg, #f8fafc 0%, #e5f7ff 100%)'
     default:
-      return '';
+      return ''
   }
 }
 
@@ -70,10 +72,7 @@ const createTask = async () => {
     }
     await addTask(props.id, TaskData)
     emits('updAll')
-    state.value.newTask.title = ''
-    state.value.newTask.description = ''
-    state.value.newTask.assignedID = 0
-    state.value.newTask.due = ''
+    state.value.newTask = new TaskEntity()
     visible.value = false
   } catch (error) {
     console.error('Error al agregar el proyecto:', error.response?.data || error)
@@ -85,22 +84,8 @@ const addsTask = () => {
   visible.value = true
 }
 
-// Nueva función para actualizar tareas localmente al mover
 function onTaskMoved(updatedTask) {
-  // Buscar y actualizar la tarea en el array de tasks
-  const idx = props.tasks.findIndex(t => t.id === updatedTask.id);
-  if (idx !== -1) {
-    // Si la tarea ya no pertenece a esta columna, la quitamos
-    if (updatedTask.state !== props.taskColumn) {
-      props.tasks.splice(idx, 1);
-    } else {
-      // Si sigue en la columna, solo actualizamos
-      props.tasks[idx] = { ...props.tasks[idx], ...updatedTask };
-    }
-  } else if (updatedTask.state === props.taskColumn) {
-    // Si la tarea fue movida a esta columna, la agregamos
-    props.tasks.push(updatedTask);
-  }
+  emits('taskMoved', updatedTask)
 }
 </script>
 
@@ -112,17 +97,27 @@ function onTaskMoved(updatedTask) {
       </template>
       <template #content>
         <div class="overflow">
-          <Task v-for="(task, index) in props.tasks" :key="index"
-                :title="task.title" :description="task.description" :assigned="task.assigneeName" :assignedID="task.assigneeId"
-                :due="task.dueDate" :id="task.id" :projectId="props.id"
-                @taskDel="emits('updAll')"
-                @taskMoved="onTaskMoved"
-                :state="props.taskColumn"/>
+          <Task
+              v-for="(task, index) in props.tasks"
+              :key="index"
+              :title="task.title"
+              :description="task.description"
+              :assigned="task.assigneeName"
+              :assignedID="task.assigneeId"
+              :due="task.dueDate"
+              :id="task.id"
+              :projectId="props.id"
+              :state="task.state"
+              :teamMembers="props.teamMembers"
+              @taskDel="emits('updAll')"
+              @taskMoved="onTaskMoved"
+          />
         </div>
       </template>
     </Card>
   </div>
 </template>
+
 
 <style scoped>
 .column-title {

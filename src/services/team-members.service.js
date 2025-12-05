@@ -1,48 +1,70 @@
+// src/services/team-members.service.js
 import axios from "axios";
-import {environment} from "@/environment/environment.js";
-import {UserService} from "@/services/user.service.js";
+import { environment } from "@/environment/environment.js";
+import { UserService } from "@/services/user.service.js";
 
 class TeamMembersService {
-    baseUrl = ""
-    userService = null;
-    constructor(){
+    constructor() {
         this.userService = new UserService();
-        this.baseUrl = environment.baseUrl;
+        this.baseUrl = environment.baseUrl; // p.ej. http://localhost:7000
     }
+
 
     async getMembers(companyId) {
-        let response = null
+        if (!companyId) {
+            console.warn("getMembers llamado sin companyId, devolviendo []");
+            return [];
+        }
+
         try {
             const headers = this.userService.getHeadersAuthorization();
-            response = await axios.get(`${this.baseUrl}/users/${companyId}`, { headers });
-            console.log('TeamMembers Response', response)
-        }catch(e) {
-            console.error('Error to obtain the team members', e);
+
+            const response = await axios.get(
+                this.baseUrl + "/profiles/api/Profiles",
+                {
+                    headers: headers,
+                    params: { companyId: companyId }
+                }
+            );
+
+            console.log("TeamMembers Response", response.data);
+            return response.data;
+        } catch (e) {
+            console.error("Error to obtain the team members", e);
+            return [];
         }
-        return response;
     }
+
 
     async newMessage(body) {
-        let response = null
-        try {
-            const headers = this.userService.getHeadersAuthorization();
-            response = await axios.post(`${this.baseUrl}/users/messages`, body, { headers });
-        }catch(e) {
-            console.error('Error to send the message', e);
-        }
-        return response;
+        console.warn(
+            "newMessage aún no está implementado en la arquitectura de microservicios",
+            body
+        );
+        return null;
     }
 
+
     async kickMember(idUser) {
-        let response = null;
-        try {
-            const headers = this.userService.getHeadersAuthorization();
-            response = await axios.put(`${this.baseUrl}/users/kick-member/${idUser}`, {}, { headers });
-        } catch(e) {
-            console.error('Error to kick the member', e);
+        if (!idUser) {
+            console.warn("kickMember llamado sin idUser");
+            return null;
         }
 
-        return response;
+        try {
+            const headers = this.userService.getHeadersAuthorization();
+
+            const response = await axios.delete(
+                this.baseUrl + "/profiles/api/Profiles/kick/" + idUser,
+                { headers: headers }
+            );
+
+            console.log("KickMember Response", response.data);
+            return response.data;
+        } catch (e) {
+            console.error("Error to kick the member", e);
+            return null;
+        }
     }
 }
 

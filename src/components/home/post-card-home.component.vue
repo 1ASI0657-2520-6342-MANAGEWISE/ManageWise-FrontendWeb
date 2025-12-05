@@ -10,11 +10,11 @@ import image8 from "../../assets/post-comment-image-8.webp";
 import image9 from "../../assets/post-comment-image-9.webp";
 import image10 from "../../assets/post-comment-image-10.webp";
 
-import {PostApiService} from "@/services/post.service.js";
+import { PostApiService } from "@/services/post.service.js";
 
 export default {
   name: "post-card-home",
-  props: ['post'],
+  props: ["post"],
   data() {
     return {
       hasRate: false,
@@ -22,22 +22,48 @@ export default {
       likeCount: this.post.rating || 0,
       postApi: new PostApiService(),
       images: [
-        image1, image2, image3, image4, image5, image6, image7, image8, image9, image10
-      ]
-    }
+        image1,
+        image2,
+        image3,
+        image4,
+        image5,
+        image6,
+        image7,
+        image8,
+        image9,
+        image10,
+      ],
+    };
   },
   computed: {
     user() {
       return this.$store.state.user;
-    }
+    },
+    // 🔹 Nombre del autor
+    displayUserName() {
+      // si viene del backend, úsalo
+      if (this.post && this.post.userName) return this.post.userName;
+      // fallback por si acaso
+      return "AuthorName";
+    },
+    // 🔹 Email del autor
+    displayUserEmail() {
+      if (this.post && this.post.email) return this.post.email;
+      return "author@example.com";
+    },
+    // 🔹 Imagen del autor
+    displayUserImage() {
+      if (this.post && this.post.userImage) return this.post.userImage;
+      return "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
+    },
   },
   methods: {
     onClickLike() {
       if (this.hasLiked) return;
       this.hasLiked = true;
       this.likeCount++;
-      this.postApi.updatePostRating(this.post.id, this.user.id)
-      if(this.hasLiked) {
+      this.postApi.updatePostRating(this.post.id, this.user.id);
+      if (this.hasLiked) {
         this.hasLiked = true;
       }
     },
@@ -53,9 +79,13 @@ export default {
         selectedImages.push(image);
       }
       return selectedImages;
-    }
-  }
-}
+    },
+  },
+  mounted() {
+    // 👀 Para verificar qué viene realmente del backend:
+    console.log("[PostCard] post recibido:", this.post);
+  },
+};
 </script>
 
 <template>
@@ -63,26 +93,40 @@ export default {
     <template #header>
       <div class="header-row flex flex-row gap-4 justify-content-between flex-wrap align-items-center">
         <div class="flex flex-row gap-3 align-items-center">
-          <pv-avatar aria-label="User Avatar"
-                     class="profile-avatar"
-                     :image="post.userImg || 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg'"
-                     shape="circle"/>
+          <pv-avatar
+              aria-label="User Avatar"
+              class="profile-avatar"
+              :image="displayUserImage"
+              shape="circle"
+          />
           <div class="user-info flex flex-column justify-content-center">
-            <span class="user-name font-semibold text-lg">{{ post.userName || 'Jhon Doe' }}</span>
-            <span class="user-email text-green-700 text-sm">{{ post.email }}</span>
+            <span class="user-name font-semibold text-lg">
+              {{ displayUserName }}
+            </span>
+            <span class="user-email text-green-700 text-sm">
+              {{ displayUserEmail }}
+            </span>
           </div>
         </div>
         <div class="align-self-center border-round-2xl like-container">
-          <button class="like-btn" :class="{ liked: hasLiked }" @click="onClickLike" :disabled="hasLiked" aria-label="Like post">
+          <button
+              class="like-btn"
+              :class="{ liked: hasLiked }"
+              @click="onClickLike"
+              :disabled="hasLiked"
+              aria-label="Like post"
+          >
             <i :class="['pi', hasLiked ? 'pi-heart-fill' : 'pi-heart', 'like-icon']"></i>
           </button>
           <span class="like-count">{{ likeCount }}</span>
         </div>
       </div>
     </template>
+
     <template #title>
       <h2 class="post-title mt-2 mb-1">{{ post.title }}</h2>
     </template>
+
     <template #subtitle>
       <div class="subtitle-row mb-2">
         <span class="subject-label">Subject:</span>
@@ -90,14 +134,20 @@ export default {
       </div>
       <span class="greeting">Dear Hope Haven Team,</span>
     </template>
+
     <template #content>
       <div class="post-content mb-3">
         <p class="post-comment line-height-3">{{ post.description }}</p>
       </div>
-      <div class="card-image-container ">
+      <div class="card-image-container">
         <div class="images-post-container">
-          <div v-for="image in generateRandomImagesForPosts()" :key="image" class="image-container">
-            <img class="post-image" :src="image" alt=""/>
+          <div
+              v-for="image in generateRandomImagesForPosts()
+            "
+              :key="image"
+              class="image-container"
+          >
+            <img class="post-image" :src="image" alt="" />
           </div>
         </div>
         <div class="date-container flex-1">
@@ -109,12 +159,20 @@ export default {
       </div>
     </template>
   </pv-card>
-  <pv-dialog :style="{margin: '0 10px'}" :visible.sync="hasRate" :modal="true" :closable="false">
+
+  <pv-dialog
+      :style="{ margin: '0 10px' }"
+      :visible.sync="hasRate"
+      :modal="true"
+      :closable="false"
+  >
     <div class="rating-modal p-5 flex flex-column align-items-center gap-5 text-center">
-      <i class="text-7xl pi pi-heart-fill text-pink-500 animate__animated animate__tada"></i>
+      <i class="text-7xl pi pi-heart-fill text-pink-500 animate_animated animate_tada"></i>
       <h1 class="modal-title">Like Sent!</h1>
-      <p class="modal-desc text-md">Your like for the post has been successfully recorded</p>
-      <pv-button class="py-3 px-5 modal-btn" label="OK" @click="hasRate = false"/>
+      <p class="modal-desc text-md">
+        Your like for the post has been successfully recorded
+      </p>
+      <pv-button class="py-3 px-5 modal-btn" label="OK" @click="hasRate = false" />
     </div>
   </pv-dialog>
 </template>

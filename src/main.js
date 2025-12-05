@@ -8,7 +8,7 @@ import Clipboard from 'v-clipboard'
 // Add PrimeVue
 import PrimeVue from "primevue/config";
 import { store } from "@/store/store.js";
-
+import ToastService from 'primevue/toastservice';
 // import i18n from "@/i18n.js";
 import i18n from "@/i18n.js";
 
@@ -65,6 +65,7 @@ configure({
 createApp(App)
     .use(PrimeVue, { ripple: true })
     .use(router)
+    .use(ToastService)
     .use(store)
     .use(Clipboard)
     .use(i18n)

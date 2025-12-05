@@ -1,156 +1,163 @@
 import axios from 'axios';
-import {environment} from "@/environment/environment.js";
-import {UserService} from "@/services/user.service.js";
-// Función para obtener la lista de proyectos desde la API
+import { environment } from "@/environment/environment.js";
+import { UserService } from "@/services/user.service.js";
+
+const getHeaders = () => {
+    const userService = new UserService();
+    return userService.getHeadersAuthorization();
+};
+
 export async function fetchProjects(companyId) {
     try {
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.get(`${environment.baseUrl}/projects/${companyId}`, { headers });
-
-        console.log("Datos obtenidos de la API:", response.data);
-        return response.data; // Devuelve la lista de proyectos obtenidos de la API
+        const headers = getHeaders();
+        const response = await axios.get(
+            `${environment.baseUrl}/tasks/Projects?companyId=${companyId}`,
+            { headers }
+        );
+        console.log("Projects obtenidos:", response.data);
+        return response.data;
     } catch (error) {
-        console.error("Error al obtener datos de la API:", error);
-        throw error; // Lanza una excepción si ocurre algún problema al obtener datos de la API
+        console.error("Error fetching projects:", error);
+        throw error;
     }
 }
 
 export const addProject = async (projectData) => {
     try {
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.post(`${environment.baseUrl}/projects`, projectData, { headers });
-        console.log("Nuevo proyecto creado:", response.data);
-        return response.data; // Retorna los datos del nuevo proyecto creado
+        const headers = getHeaders();
+        const response = await axios.post(
+            `${environment.baseUrl}/tasks/Projects`,
+            projectData,
+            { headers }
+        );
+        console.log("Proyecto creado:", response.data);
+        return response.data;
     } catch (error) {
-        console.error('Error al agregar el proyecto:', error);
+        console.error("Error adding project:", error);
         throw error;
     }
 };
 
-
-
-
-// src/services/project-api-service.js
-
-// Función para obtener los datos de tareas de un proyecto específico desde la API
 export async function fetchTaskData(projectId) {
     try {
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.get(`${environment.baseUrl}/projects/${projectId}/task-items/all`, { headers });
-
-        console.log("Datos obtenidos de la API para TASKS:", response.data);
-        return response.data; // Devuelve la lista de proyectos obtenidos de la API
+        const headers = getHeaders();
+        const response = await axios.get(
+            `${environment.baseUrl}/tasks/TaskItems?projectId=${projectId}`,
+            { headers }
+        );
+        console.log("Tasks obtenidas:", response.data);
+        return response.data;
     } catch (error) {
-        console.error("Error al obtener datos de la API:", error);
-        throw error; // Lanza una excepción si ocurre algún problema al obtener datos de la API
+        console.error("Error fetching tasks:", error);
+        throw error;
     }
-
-
-
 }
 
 export async function fetchTasksByCompanyId(companyId) {
     try {
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.get(`${environment.baseUrl}/company-tasks/${companyId}`, { headers });
-
-        console.log("Datos obtenidos de la API para COMPANY TASKS:", response.data);
-        return response.data; // Devuelve la lista de tareas obtenidas de la API
+        const headers = getHeaders();
+        const response = await axios.get(
+            `${environment.baseUrl}/tasks/TaskItems/company/${companyId}`,
+            { headers }
+        );
+        console.log("Company Tasks obtenidas:", response.data);
+        return response.data;
     } catch (error) {
-        console.error("Error al obtener tareas de la compañía:", error);
-        throw error; // Lanza una excepción si ocurre algún problema al obtener datos de la API
-    }
-}
-      
-export async function fetchTaskDataByUserId(projectId, userId) {
-    try {
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.get(`${environment.baseUrl}/user-tasks-project/${projectId}/user/${userId}`, { headers });
-        console.log("Datos obtenidos de la API para TASKS por usuario:", response.data);
-        return response.data; // Devuelve la lista de tareas del proyecto filtradas por usuario
-    } catch (error) {
-        console.error("Error al obtener datos de la API:", error);
-        throw error; // Lanza una excepción si ocurre algún problema al obtener datos de la API
+        console.error("Error fetching company tasks:", error);
+        throw error;
     }
 }
 
 export async function fetchAllTaskDataByUserId(projectId, userId) {
     try {
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.get(`${environment.baseUrl}/Projects/${projectId}/task-items/user/${userId}`, { headers });
-        console.log("Datos obtenidos de la API para TASKS por usuario:", response.data);
-        return response.data; // Devuelve la lista de tareas del proyecto filtradas por usuario
-    } catch (error) {
-        console.error("Error al obtener datos de la API:", error);
+        const headers = getHeaders();
+        const response = await axios.get(
+            `${environment.baseUrl}/tasks/TaskItems/user/${userId}`,
+            { headers }
+        );
 
-        throw error; // Lanza una excepción si ocurre algún problema al obtener datos de la API
+        const tasks = response.data;
+        if (projectId) {
+            return tasks.filter((t) => t.projectId === projectId);
+        }
+        return tasks;
+    } catch (error) {
+        console.error("Error fetching user tasks:", error);
+        throw error;
     }
 }
+
 
 export async function addTask(projectId, newTask) {
     try {
-        // Agregar la nueva tarea al arreglo existente de tareas del proyecto
-        console.log("task", newTask);
-        
         const newTaskData = {
-            "title": newTask.title,
-            "description": newTask.description,
-            "dueDate": newTask.due,
-            "state": newTask.state,
-            "assigneeId": newTask.assigned,
-        }
+            title: newTask.title,
+            description: newTask.description,
+            dueDate: newTask.due,
+            state: newTask.state,
+            assigneeId: newTask.assigned,
+            projectId: parseInt(projectId, 10)
+        };
 
+        const headers = getHeaders();
+        console.log("Enviando nueva tarea:", newTaskData);
 
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        console.log("Nueva tarea creada:", newTaskData);
-        const response = await axios.post(`${environment.baseUrl}/projects/${projectId}/task-items`, newTaskData, { headers });
-        return response.data; // Devuelve los datos actualizados del proyecto
-    } catch (error) {
-        console.error('Error al agregar la tarea al proyecto:', error.response.data);
-        throw error;
-    }
-}
-
-export async function deleteTask(projectID, taskID){
-    try{
-        console.log("Task a eliminar" , taskID);
-        //project.tasks = project.tasks.filter(task => task.id !== taskID);
-
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.delete(`${environment.baseUrl}/projects/${projectID}/task-items/${taskID}`, { headers });
+        const response = await axios.post(
+            `${environment.baseUrl}/tasks/TaskItems`,
+            newTaskData,
+            { headers }
+        );
         return response.data;
     } catch (error) {
-        console.error('Error al Eliminar la tarea al proyecto:', error);
+        console.error("Error adding task:", error.response?.data || error);
         throw error;
     }
 }
 
-export async function editTask(projectID , taskData){
-    try{
+export async function deleteTask(projectID, taskID) {
+    try {
+        console.log("Eliminando Task ID:", taskID);
+        const headers = getHeaders();
+        const response = await axios.delete(
+            `${environment.baseUrl}/tasks/TaskItems/${taskID}`,
+            { headers }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting task:", error);
+        throw error;
+    }
+}
+
+
+export async function editTask(projectID, taskData) {
+    try {
+        let due = taskData.due;
+        if (due instanceof Date) {
+            due = due.toISOString().split("T")[0];
+        }
+
         const taskBody = {
+            id: taskData.id,
             title: taskData.title,
             description: taskData.description,
-            dueDate: taskData.due,
-            state: taskData.state, // CORREGIDO: debe ser state, no status
-            assigneeId: taskData.assignedID,
-        }
+            dueDate: due ?? taskData.dueDate,
+            state: taskData.state,
+            assigneeId: taskData.assignedID ?? taskData.assigneeId,
+            projectId: parseInt(projectID, 10)
+        };
 
-        console.log("Task a editar" , taskData);
+        console.log("Editando Task:", taskBody);
+        const headers = getHeaders();
 
-        const userService = new UserService();
-        const headers = userService.getHeadersAuthorization();
-        const response = await axios.put(`${environment.baseUrl}/projects/${projectID}/task-items/edit/${taskData.id}`, taskBody, { headers });
+        const response = await axios.put(
+            `${environment.baseUrl}/tasks/TaskItems/${taskData.id}`,
+            taskBody,
+            { headers }
+        );
         return response.data;
     } catch (error) {
-        console.error('Error al Editar la tarea al proyecto:', error);
+        console.error("Error editing task:", error.response?.data || error);
         throw error;
     }
 }

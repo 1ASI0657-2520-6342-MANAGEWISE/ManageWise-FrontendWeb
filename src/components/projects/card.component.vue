@@ -1,7 +1,11 @@
 <template>
   <div class="project-card">
     <Button class="img-but" @click="openTodo">
-      <img :src="project.imageUrl[0] || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'" alt="Project Image" class="project-image" />
+      <img
+          :src="project.imageUrl?.[0] || 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'"
+          alt="Project Image"
+          class="project-image"
+      />
     </Button>
     <div class="project-name">{{ project.name }}</div>
   </div>
@@ -9,17 +13,17 @@
 
 <script setup>
 import Button from "primevue/button";
-import {defineProps} from 'vue';
+import { defineProps } from 'vue';
 import router from "@/router/index.js";
 import { useStore } from 'vuex';
+
 const props = defineProps({
-
   project: {
-    type: Object, // Cambiado de ProjectsEntity a Object para evitar warnings
-        required: true,
+    type: Object,
+    required: true,
   },
-
 });
+
 const store = useStore();
 
 const openTodo = () => {
@@ -32,8 +36,6 @@ const openTodo = () => {
   });
   console.log('Project set in store:', props.project);
 };
-
-
 </script>
 
 <style scoped>
@@ -66,10 +68,7 @@ const openTodo = () => {
   cursor: pointer;
   transform: scale(1.05);
   transition: transform 0.3s ease;
-
 }
-
-
 
 @media (max-width: 768px) {
   .project-card {

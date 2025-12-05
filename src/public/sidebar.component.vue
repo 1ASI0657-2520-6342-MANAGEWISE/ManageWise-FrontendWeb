@@ -38,10 +38,9 @@ export default {
       return (this.user?.role ?? '').toString().trim().toLowerCase();
     },
     isManager() {
-      return this.roleLower === 'manager';
-    },
+      return this.roleLower === '0' || this.roleLower === 'manager';
+      },
     hasUser() {
-      // si quieres: solo mostrar Team cuando hay usuario cargado
       return !!this.user && Object.keys(this.user).length > 0;
     }
 
@@ -115,7 +114,6 @@ export default {
             <p class="font-medium text-base" v-t="'sidebar.createpost'">Create Post</p>
           </li>
 
-          <!-- Team: visible para TODOS los roles (incluye Manager) -->
           <li class="flex flex-row gap-3 align-items-center py-3 pl-4 border-round-md"
               @click="navigateToTeam"
               :class="{ active: $route.path === '/team' }"
@@ -213,7 +211,6 @@ aside {
   background-color: #f8f8f8;
 }
 
-/*esta clases son de la etiqueta "transition"*/
 
 .slide-enter {
   transform: translateX(-120%);
