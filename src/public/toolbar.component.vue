@@ -19,11 +19,11 @@ export default {
     user() {
       return this.$store.state.user || {};
     },
-    // CORRECCIÓN 1: Transformar el '0' en un texto legible
     roleLabel() {
-      const role = this.user.role;
+      const role = this.user?.role;
       if (role === 0 || role === '0') return 'Manager';
-      return role || '';
+      if (role === 1 || role === '1') return 'Team Member';
+      return role || ''
     }
   },
   methods: {
@@ -35,32 +35,37 @@ export default {
         this.$router.push(`/profile/${this.user.id}`);
       }
     },
-    // Método separado para buscar miembros
     async fetchMembers(companyId) {
-      if (!companyId) {
-        this.members = 0;
-        return;
-      }
+      if (!companyId) return;
       try {
         const response = await this.teamMemberService.getMembers(companyId);
-        if (response && response.data) {
-          this.members = response.data.length;
+
+        const membersList = Array.isArray(response) ? response : response?.data;
+
+        if (Array.isArray(membersList)) {
+          this.members = membersList.length;
         } else {
           this.members = 0;
         }
       } catch (error) {
-        console.error("Error obteniendo miembros:", error);
+        console.error("Error al obtener miembros:", error);
         this.members = 0;
       }
     }
   },
-  // CORRECCIÓN 2: Usar watch para esperar a que el companyId cargue en el store
   watch: {
     'user.companyId': {
       immediate: true,
-      handler(newId) {
-        this.fetchMembers(newId);
+      handler(newVal) {
+        if (newVal) {
+          this.fetchMembers(newVal);
+        }
       }
+    }
+  },
+  async mounted() {
+    if (this.user && this.user.companyId) {
+      await this.fetchMembers(this.user.companyId);
     }
   }
 }
@@ -75,7 +80,6 @@ export default {
           <img class="block h-2rem w-3rem" src="../assets/ManageWise_logo.png" alt="ManageWise"/>
           <div class="title-container flex flex-column justify-content-center line-height-2" style="gap: 2px">
             <p class="title font-semibold " style="letter-spacing: 1px;">ManageWise</p>
-            <!-- Usamos roleLabel en vez de user.role -->
             <span class="text-sm capitalize" style="letter-spacing: .8px;">{{ roleLabel }}</span>
           </div>
         </div>

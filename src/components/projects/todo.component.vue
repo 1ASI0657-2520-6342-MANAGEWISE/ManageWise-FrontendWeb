@@ -169,86 +169,114 @@ const handleTaskMoved = (updatedTask) => {
       </header>
 
       <!-- DIALOG NUEVA TAREA -->
-      <Dialog modal class="p-dialog" v-model:visible="visible" :closeOnOutsideClick="true">
+      <Dialog
+          modal
+          class="task-dialog-custom"
+          v-model:visible="visible"
+          :closeOnEscape="true"
+          :dismissableMask="true"
+          :closable="true"
+          :style="{ width: '540px', maxWidth: '95vw' }"
+      >
+        <template #header>
+          <div class="custom-dialog-header">
+            <div class="header-content-wrapper">
+              <div class="header-icon-wrapper">
+                <i class="pi pi-plus-circle"></i>
+              </div>
+              <div class="header-text">
+                <h2 class="header-title">Add New Task</h2>
+                <p class="header-subtitle">Fill in the details below to create a new task</p>
+              </div>
+            </div>
+          </div>
+        </template>
+
         <form
-            class="modern-task-dialog flex-dialog"
+            class="task-form-content"
             @submit.prevent="() => createTask('To-Do')"
             autocomplete="off"
         >
-          <div class="dialog-header">
-            <span class="dialog-icon"><i class="pi pi-plus-circle"></i></span>
-            <div>
-              <h2 class="dialog-title">Add New Task</h2>
-              <p class="dialog-sub">Fill in the details below to create a new task.</p>
-            </div>
+          <div class="form-field-group">
+            <label for="title" class="field-label">
+              <i class="pi pi-bookmark"></i>
+              Title <span class="required-star">*</span>
+            </label>
+            <InputText
+                id="title"
+                class="field-input"
+                autocomplete="off"
+                v-model="newTask.title"
+                placeholder="Enter task title"
+                required
+                aria-required="true"
+            />
           </div>
 
-          <div class="dialog-fields">
-            <div class="dialog-field">
-              <label for="title" class="dialog-label">Title</label>
-              <InputText
-                  id="title"
-                  class="dialog-input"
-                  autocomplete="off"
-                  v-model="newTask.title"
-                  placeholder="Task title"
-                  required
-                  aria-required="true"
-              />
-            </div>
-
-            <div class="dialog-field">
-              <label for="description" class="dialog-label">Description</label>
-              <InputText
-                  id="description"
-                  class="dialog-input"
-                  autocomplete="off"
-                  v-model="newTask.description"
-                  placeholder="Task description"
-              />
-            </div>
-
-            <div class="dialog-field">
-              <label for="assigned" class="dialog-label">Employee Assigned</label>
-              <Dropdown
-                  id="assigned"
-                  class="dialog-input"
-                  v-model="newTask.assignedID"
-                  :options="teamMembers"
-                  optionLabel="name"
-                  optionValue="id"
-                  placeholder="Select employee"
-                  required
-                  aria-required="true"
-              />
-            </div>
-
-            <div class="dialog-field">
-              <label for="due" class="dialog-label">Due date</label>
-              <Calendar
-                  id="due"
-                  v-model="newTask.due"
-                  :minDate="new Date()"
-                  :manualInput="false"
-                  class="dialog-input"
-                  placeholder="Select date"
-                  required
-                  aria-required="true"
-              />
-            </div>
+          <div class="form-field-group">
+            <label for="description" class="field-label">
+              <i class="pi pi-align-left"></i>
+              Description
+            </label>
+            <InputText
+                id="description"
+                class="field-input"
+                autocomplete="off"
+                v-model="newTask.description"
+                placeholder="Add task description (optional)"
+            />
           </div>
 
-          <div class="dialog-actions">
+          <div class="form-field-group">
+            <label for="assigned" class="field-label">
+              <i class="pi pi-user"></i>
+              Assigned To <span class="required-star">*</span>
+            </label>
+            <Dropdown
+                id="assigned"
+                class="field-dropdown"
+                v-model="newTask.assignedID"
+                :options="teamMembers"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Select team member"
+                required
+                aria-required="true"
+            />
+          </div>
+
+          <div class="form-field-group">
+            <label for="due" class="field-label">
+              <i class="pi pi-calendar"></i>
+              Due Date <span class="required-star">*</span>
+            </label>
+            <Calendar
+                id="due"
+                v-model="newTask.due"
+                :minDate="new Date()"
+                :manualInput="false"
+                class="field-calendar"
+                placeholder="Select due date"
+                dateFormat="dd/mm/yy"
+                required
+                aria-required="true"
+            />
+          </div>
+
+          <div class="form-actions">
             <Button
                 type="button"
                 label="Cancel"
-                text
+                severity="secondary"
+                outlined
+                class="btn-cancel"
                 @click="visible = false"
             />
             <Button
                 label="Add Task"
                 type="submit"
-                class="dialog-add-btn"
+                class="btn-submit"
+                icon="pi pi-check"
             />
           </div>
         </form>
@@ -291,7 +319,6 @@ const handleTaskMoved = (updatedTask) => {
     </div>
   </section>
 </template>
-
 <style scoped>
 .board-bg {
   min-height: 100vh;
@@ -454,6 +481,260 @@ const handleTaskMoved = (updatedTask) => {
 @media (max-width: 500px) {
   .board-bg {
     padding: 0.5rem 0 1rem 0;
+  }
+}
+
+
+:deep(.task-dialog-custom .p-dialog-header) {
+  padding: 0 !important;
+  border: none !important;
+  background: linear-gradient(135deg, #fef3e7 0%, #fef9f3 100%) !important;
+  border-radius: 1.2rem 1.2rem 0 0 !important;
+  border-bottom: 2px solid #f3e8dc !important;
+}
+
+:deep(.task-dialog-custom .p-dialog-header-icons) {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+}
+
+:deep(.task-dialog-custom .p-dialog-header-icon) {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  color: #6b7280 !important;
+  background: transparent !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+:deep(.task-dialog-custom .p-dialog-header-icon:hover) {
+  background: rgba(255, 255, 255, 0.4) !important;
+  color: #374151 !important;
+}
+
+:deep(.task-dialog-custom .p-dialog-content) {
+  padding: 0 !important;
+  background: #fff;
+  border-radius: 0 0 1.2rem 1.2rem;
+}
+
+.custom-dialog-header {
+  padding: 2.4rem 2rem 2.2rem 2rem;
+  background: transparent;
+  border-bottom: none;
+}
+
+.header-content-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+}
+
+.header-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #FA8224, #ff9d4d);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(250, 130, 36, 0.25);
+  flex-shrink: 0;
+}
+
+.header-icon-wrapper i {
+  color: #fff;
+  font-size: 1.6rem;
+}
+
+.header-text {
+  flex: 1;
+  padding-top: 0.2rem;
+}
+
+.header-title {
+  font-family: 'Lora', serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #FA8224;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: 0.3px;
+}
+
+.header-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.task-form-content {
+  padding: 2rem 2rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.field-label i {
+  color: #FA8224;
+  font-size: 0.95rem;
+}
+
+.required-star {
+  color: #FA8224;
+  font-weight: 700;
+  margin-left: 0.15rem;
+}
+
+.field-input,
+.field-dropdown,
+.field-calendar {
+  width: 100%;
+  border: 2px solid #e3e8ee;
+  border-radius: 0.7rem;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.field-input:focus,
+.field-dropdown:focus,
+.field-calendar:focus {
+  border-color: #FA8224;
+  box-shadow: 0 0 0 3px rgba(250, 130, 36, 0.1);
+  outline: none;
+}
+
+.field-input::placeholder {
+  color: #9ca3af;
+}
+
+:deep(.field-dropdown .p-dropdown-label) {
+  padding: 0.8rem 1rem;
+}
+
+:deep(.field-dropdown .p-dropdown-trigger) {
+  color: #FA8224;
+}
+
+:deep(.field-calendar input) {
+  border: none;
+  padding: 0;
+  font-size: 1rem;
+}
+
+:deep(.field-calendar .p-datepicker-trigger) {
+  color: #FA8224;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e3e8ee;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 0.85rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.7rem;
+  border: 2px solid #e3e8ee;
+  color: #374151;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #1f2937;
+}
+
+.btn-submit {
+  flex: 1;
+  padding: 0.85rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 0.7rem;
+  background: linear-gradient(135deg, #FA8224, #ff9d4d);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(250, 130, 36, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-submit:hover {
+  background: linear-gradient(135deg, #e8751f, #f08a3d);
+  box-shadow: 0 6px 16px rgba(250, 130, 36, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .custom-dialog-header {
+    padding: 2rem 1.2rem 1.6rem 1.2rem;
+  }
+
+  .header-content-wrapper {
+    gap: 1rem;
+  }
+
+  .header-icon-wrapper {
+    width: 44px;
+    height: 44px;
+  }
+
+  .header-icon-wrapper i {
+    font-size: 1.3rem;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.88rem;
+  }
+
+  .task-form-content {
+    padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+    gap: 1.2rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  :deep(.task-dialog-custom .p-dialog-header-icons) {
+    top: 1.2rem;
+    right: 1.2rem;
   }
 }
 </style>

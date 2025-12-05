@@ -20,19 +20,10 @@ export default {
       return this.$store.state.user;
     }
   },
-  // CORRECCIÓN 1: Quitamos created() porque dispara la petición demasiado rápido (cuando user es null)
-  /*
-  async created() {
-    await this.fetchNewPosts();
-  },
-  */
-
-  // CORRECCIÓN 2: Usamos watch para disparar la petición SOLO cuando tengamos datos del usuario
   watch: {
     user: {
-      immediate: true, // Intenta ejecutar al inicio
+      immediate: true,
       handler(newUser) {
-        // Solo llamamos a la API si el usuario y el companyId existen
         if (newUser && newUser.companyId) {
           this.fetchNewPosts();
         }
@@ -63,7 +54,6 @@ export default {
       if (!Array.isArray(list)) return [];
 
       return list.map((item) => {
-        // Manejamos PostTime o CreatedAt por si acaso
         const dateToUse = item.postTime || item.createdAt || new Date().toISOString();
         const formattedDate = this.formatDate(dateToUse);
 
@@ -86,7 +76,6 @@ export default {
     },
 
     async fetchNewPosts() {
-      // Guard de seguridad extra
       if (!this.user?.companyId) return;
 
       try {
@@ -98,10 +87,19 @@ export default {
         this.posts = this.buildPostListFromResponseData(items);
         console.log("posts acquired:", this.posts.length);
       } catch (e) {
-        this.hasError = true;
-        this.errorMsg = e?.response?.data?.title || "Error cargando publicaciones";
-        console.error("No se pudieron obtener posts", e?.response?.data || e);
-        this.posts = [];
+        // --- CORRECCIÓN IMPORTANTE ---
+        // Si el error es 404, significa que no hay posts, NO es un error del sistema.
+        if (e.response && e.response.status === 404) {
+          console.log("No posts found (404).");
+          this.posts = []; // Lista vacía
+          this.hasError = false; // No mostramos error
+        } else {
+          // Cualquier otro error (500, 400, red) sí es un error real
+          this.hasError = true;
+          this.errorMsg = e?.response?.data?.title || "Error cargando publicaciones";
+          console.error("No se pudieron obtener posts", e?.response?.data || e);
+          this.posts = [];
+        }
       } finally {
         this.hasLoading = false;
       }
@@ -117,9 +115,26 @@ export default {
     </div>
     <h2 class="home-title text-xl font-normal my-4">New posts:</h2>
 
-    <p v-if="hasLoading">Cargando publicaciones…</p>
-    <p v-else-if="hasError">{{ errorMsg }}</p>
-    <post-list-home v-else :posts="posts"></post-list-home>
+    <div v-if="hasLoading" class="flex justify-content-center p-5">
+      <i class="pi pi-spin pi-spinner text-4xl text-gray-400"></i>
+    </div>
+
+    <p v-else-if="hasError" class="error-text">{{ errorMsg }}</p>
+
+    <!-- Caso 1: Hay posts -->
+    <post-list-home v-else-if="posts.length > 0" :posts="posts"></post-list-home>
+
+    <!-- Caso 2: No hay posts (Estado vacío bonito) -->
+    <div v-else class="empty-state flex flex-column align-items-center justify-content-center gap-3 mt-3 p-5 border-round-xl surface-50">
+      <div class="icon-circle bg-white p-3 border-round-circle shadow-1">
+        <i class="pi pi-inbox text-4xl text-gray-400"></i>
+      </div>
+      <div class="text-center">
+        <h3 class="text-xl font-medium text-gray-600 m-0">No posts yet</h3>
+        <p class="text-gray-500 mt-2 text-sm">It seems there are no publications for your company yet.</p>
+      </div>
+    </div>
+
   </section>
 </template>
 
@@ -152,5 +167,23 @@ section {
   width: 100%;
   height: 18rem;
   object-fit: cover;
+}
+
+.error-text {
+  color: #e11d48;
+  font-weight: 500;
+}
+
+.empty-state {
+  border: 2px dashed #e5e7eb;
+  min-height: 200px;
+}
+
+.icon-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
 }
 </style>

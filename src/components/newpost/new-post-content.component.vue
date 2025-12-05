@@ -52,7 +52,6 @@ export default {
 <template>
   <section class="new-post-container relative flex flex-column p-4 lg:p-5">
     <h1 class="newpost-title text-4xl font-medium mb-3" v-t="'newpost.createpost'"></h1>
-    <p class="text-sm text-gray-700" v-t="'newpost.norecentpublications'"></p>
     <div class="post-background h-full flex flex-1 align-items-center mt-5 sm:mt-3">
       <div class="post-container shadow-3 p-4 sm:p-5 flex flex-column gap-4">
         <h2 class="font-medium">Celebrating Team Success: Hope Heaven <br/>International Impact in Action</h2>
