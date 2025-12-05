@@ -121,10 +121,8 @@ export default {
         // Llamamos al servicio
         await this.teamMemberService.kickMember(idMember);
 
-        // Si no lanza error, asumimos éxito y actualizamos la UI inmediatamente
         this.members = this.members.filter((m) => m.id !== idMember);
 
-        // Cerramos todo
         this.showKickConfirm = false;
         this.popUp = false;
         this.userSelected = null;
@@ -195,7 +193,6 @@ export default {
       </div>
     </div>
 
-    <!-- CORRECCIÓN: Eliminadas las clases 'absolute top-50 left-50' que causaban el descuadre -->
     <div class="popup" v-if="popUp && userSelected">
       <div
           class="popup__content bg-white shadow-1 border-round-2xl flex flex-column justify-content-center align-items-center p-6 relative"
@@ -347,7 +344,6 @@ export default {
   transform: scale(1.1);
 }
 
-/* CSS actualizado para centrar correctamente sin causar scroll */
 .popup {
   position: fixed;
   top: 0;

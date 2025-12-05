@@ -1,6 +1,6 @@
 <template>
   <div class="calendar-page">
-    
+
     <div class="page-header">
       <h1 class="title-projects text-4xl font-medium">Projects</h1>
       <p class="calendar-subtitle">Manage your tasks and appointments</p>
@@ -54,13 +54,14 @@
           <!-- Lista de tareas -->
           <div v-if="selectedDateTasks.length > 0" class="tasks-list">
             <div v-for="task in selectedDateTasks" :key="task.id" class="task-card"
-              :class="getTaskStateClass(task.state)">
+                 :class="getTaskStateClass(task.state)">
               <div class="task-header">
                 <div class="task-status" :class="getStatusColorClass(task.state)">
                   {{ getStatusText(task.state) }}
                 </div>
                 <div class="task-date">
-                  {{ formatTaskDate(task.createdAt) }}
+                  <!-- CORRECCIÓN: Mostrar fecha de vencimiento -->
+                  Due: {{ formatTaskDate(task.dueDate) }}
                 </div>
               </div>
 
@@ -211,9 +212,12 @@ export default {
     },
 
     selectedDateTasks() {
+      // Fecha seleccionada en formato YYYY-MM-DD
       const selectedDate = this.selectedDateObj.toISOString().split('T')[0]
+
       return this.allTasks.filter(task => {
-        return task.createdAt === selectedDate
+        const taskDate = task.dueDate ? task.dueDate.split('T')[0] : '';
+        return taskDate === selectedDate;
       })
     }
   },
@@ -229,9 +233,11 @@ export default {
       }
     },
 
-    // Método para verificar si una fecha tiene tareas
     hasTasksOnDate(date) {
-      return this.allTasks.some(task => task.createdAt === date);
+      return this.allTasks.some(task => {
+        const taskDate = task.dueDate ? task.dueDate.split('T')[0] : '';
+        return taskDate === date;
+      });
     },
 
     previousMonth() {
@@ -301,6 +307,7 @@ export default {
     },
 
     formatTaskDate(dateString) {
+      if (!dateString) return '';
       const date = new Date(dateString)
       return date.toLocaleDateString('en-US', {
         month: 'short',
@@ -776,7 +783,6 @@ export default {
   border-radius: 0.375rem;
 }
 
-/* Scrollbar personalizado */
 .tasks-list::-webkit-scrollbar {
   width: 4px;
 }

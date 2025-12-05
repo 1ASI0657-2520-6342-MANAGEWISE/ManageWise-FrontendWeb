@@ -12,7 +12,6 @@ export default {
     displayHeaderName() {
       const u = this.user;
 
-      // Preferimos firstName/lastName si existen
       const firstNameToken = (u.firstName || '').trim().split(/\s+/)[0] || '';
       const firstSurnameToken = (u.lastName || '').trim().split(/\s+/)[0] || '';
 
@@ -20,26 +19,22 @@ export default {
         return [firstNameToken, firstSurnameToken].filter(Boolean).join(' ').trim();
       }
 
-      // Si solo viene 'name'
       const full = (u.name || '').trim();
       if (!full) return '';
 
       const parts = full.split(/\s+/);
       if (parts.length === 1) return parts[0];
       if (parts.length === 2) return `${parts[0]} ${parts[1]}`;
-      return `${parts[0]} ${parts[parts.length - 2]}`; // asumimos penúltimo como primer apellido
+      return `${parts[0]} ${parts[parts.length - 2]}`;
     },
     filteredTasks() {
       return this.tasks
-          .filter(task => !this.taskFilters.status || task.status === this.taskFilters.status)
+          .filter(task => !this.taskFilters.status || task.state === this.taskFilters.status)
           .filter(task => !this.taskFilters.date || task.dueDate === this.taskFilters.date);
     },
-    // --- CORRECCIÓN APLICADA AQUÍ ---
     isManager() {
-      // Convertimos el rol a string y minúsculas para asegurar la comparación
       const role = String(this.user?.role || '').toLowerCase().trim();
-      // Ahora retorna TRUE si es '0' (Director) o 'manager'
-      return role === '0' || role === 'manager';
+      return role === '0' || role === 'manager' || role === 'director';
     },
     teamCode() {
       return this.user?.teamRegisterCode || '';
@@ -142,8 +137,8 @@ export default {
 
         this.$store.dispatch('updateUser', user);
 
-        this.clearInputUpdateInfo(); // limpamos el form luego de enviado
-        this.togglePopUp(); // cerramos el popap >.<
+        this.clearInputUpdateInfo();
+        this.togglePopUp();
       })
           .catch((error) => {
             console.error('Error al actualizar el usuario:', error);
@@ -203,7 +198,6 @@ export default {
           .catch((e) => console.error('Error al actualizar el usuario:', e));
     },
 
-    // En methods:
     async fetchUserTasks() {
       if (!this.user || !this.user.id) {
         console.warn("Esperando datos de usuario para cargar tareas...");
@@ -253,8 +247,6 @@ export default {
   }
 
 }
-
-
 </script>
 
 <template>
@@ -289,7 +281,6 @@ export default {
           <span class="non-editable">{{ user.companyName}}</span>
         </p>
 
-        <!-- AHORA ESTE DIV SE MOSTRARÁ SI EL ROL ES '0' O 'MANAGER' -->
         <div v-if="isManager" class="editable">
           <div class="team-code-row">
             <strong>Team Code:</strong>
@@ -357,9 +348,6 @@ export default {
       </div>
     </pv-dialog>
 
-
-
-
     <pv-dialog :style="{margin: '0 10px'}" :visible.sync="isFieldsEmpty" :modal="true" :closable="false">
       <div class="error-modal p-5 flex flex-column align-items-center gap-5 text-center">
         <i class="text-7xl pi pi-times-circle text-red-500"></i>
@@ -368,17 +356,17 @@ export default {
         <pv-button class="py-3 px-5" label="OK" @click="isFieldsEmpty = false"/>
       </div>
     </pv-dialog>
-    <!-- Actualizamos también esta condición para ser consistente: Si no es manager, ve las tareas -->
-    <div class="container-for-task" v-if="!isManager">
+
+    <div class="container-for-task">
       <div class="user-tasks" style="margin-top: 2rem;">
         <h1 style="margin-bottom: 1rem;">My Tasks</h1>
         <!-- Filtros -->
         <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
           <select v-model="taskFilters.status" style="padding: 0.3rem; border-radius: 5px;">
             <option value="">All Status</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="En progreso">En progreso</option>
-            <option value="Completada">Completada</option>
+            <option value="To-Do">Pendiente</option>
+            <option value="Doing">En progreso</option>
+            <option value="Done">Completada</option>
           </select>
           <input type="date" v-model="taskFilters.date" style="padding: 0.3rem; border-radius: 5px;" />
         </div>
@@ -393,7 +381,7 @@ export default {
           >
             <div class="title" style="display: flex; justify-content: space-between; align-items: center;">
               <span class="task-title" style="font-weight: bold;">{{ task.title }}</span>
-              <span style="font-size: 0.9em; color: #888;">{{ task.status }}</span>
+              <span style="font-size: 0.9em; color: #888;">{{ task.state }}</span>
             </div>
             <div style="color: #555;">{{ task.description }}</div>
             <div style="font-size: 0.9em; color: #888;">
@@ -599,7 +587,5 @@ img {
     padding: 6px 10px;
   }
 }
-
-
 
 </style>

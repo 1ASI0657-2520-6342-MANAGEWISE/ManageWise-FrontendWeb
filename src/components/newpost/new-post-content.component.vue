@@ -10,7 +10,7 @@ export default {
       isFieldsEmpty: false,
       formPost: { title: "", subject: "", description: "", images: []},
       postApi: new PostApiService(),
-      // files: [] // si luego agregas subida de archivos
+      // files: [] // subida de archivos
     };
   },
   computed: {
@@ -25,7 +25,7 @@ export default {
 
       try {
         await this.postApi.createNewPost(this.user.id, this.user.companyId, this.formPost /*, this.files */);
-        this.hasCompleted = true; // <-- ahora sí, solo tras éxito
+        this.hasCompleted = true;
         // opcional: limpiar formulario
         this.formPost = { title: "", subject: "", description: "" };
       } catch (e) {

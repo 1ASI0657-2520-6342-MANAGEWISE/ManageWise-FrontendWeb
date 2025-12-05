@@ -39,19 +39,14 @@ export default {
     user() {
       return this.$store.state.user;
     },
-    // 🔹 Nombre del autor
     displayUserName() {
-      // si viene del backend, úsalo
       if (this.post && this.post.userName) return this.post.userName;
-      // fallback por si acaso
       return "AuthorName";
     },
-    // 🔹 Email del autor
     displayUserEmail() {
       if (this.post && this.post.email) return this.post.email;
       return "author@example.com";
     },
-    // 🔹 Imagen del autor
     displayUserImage() {
       if (this.post && this.post.userImage) return this.post.userImage;
       return "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
@@ -82,7 +77,6 @@ export default {
     },
   },
   mounted() {
-    // 👀 Para verificar qué viene realmente del backend:
     console.log("[PostCard] post recibido:", this.post);
   },
 };
