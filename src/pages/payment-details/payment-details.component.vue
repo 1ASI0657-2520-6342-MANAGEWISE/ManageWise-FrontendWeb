@@ -1,19 +1,19 @@
 <script>
-import {PaymentDetailsService} from "@/services/payment-details.service.js";
+import { PaymentDetailsService } from "@/services/payment-details.service.js";
+import { RegisterService } from "@/services/register.service.js";
 
 export default {
   name: "payment-details-content",
   computed: {
-    user() {
-      return this.$store.state.user;
-    }
   },
   data() {
     return {
       paymentService: new PaymentDetailsService(),
+      registerService: new RegisterService(),
       isFieldsEmpty: false,
       areFieldsNotValid: false,
       paymentSuccess: false,
+      isProcessing: false, // Estado de carga
       form: {
         userId: 0,
         cardHolderName: '',
@@ -23,72 +23,81 @@ export default {
       }
     }
   },
+  mounted() {
+    if (!localStorage.getItem('temp_register_data')) {
+      this.$router.push('/signup');
+    }
+  },
   methods: {
 
     async onSubmitPayment() {
-
       if (!this.areCardFieldsComplete()) {
         this.isFieldsEmpty = true;
         return;
       }
 
-      if(!this.areCardFieldsValid()) {
+      if (!this.areCardFieldsValid()) {
         this.areFieldsNotValid = true;
         return;
       }
 
-      this.form.userId = this.user.id;
+      this.isProcessing = true;
 
-      await this.paymentService.savePaymentDetails(this.form)
-          .then(r=> {
-            const result = r.data;
-            if(result.status_code === 202) {
-              this.paymentSuccess = true;
-              console.log(result)
-            }
+      try {
+        const tempData = localStorage.getItem('temp_register_data');
+        if (!tempData) throw new Error("No registration data found");
 
-          })
+        const userData = JSON.parse(tempData);
 
+        const registerResponse = await this.registerService.signUpUser(userData);
 
+        if (registerResponse && (registerResponse.status === 200 || registerResponse.status === 201)) {
+          const newUserId = registerResponse.data.id;
+
+          this.form.userId = newUserId;
+
+          const paymentResponse = await this.paymentService.savePaymentDetails(this.form);
+
+          if (paymentResponse.status === 200 || paymentResponse.status === 201 || paymentResponse.data?.status_code === 202) {
+            this.paymentSuccess = true;
+
+            localStorage.removeItem('temp_register_data');
+            localStorage.removeItem('selected_plan');
+          }
+        } else {
+          throw new Error("Registration failed at backend.");
+        }
+
+      } catch (error) {
+        console.error("Error during process:", error);
+        alert("An error occurred during registration/payment. Please try again.");
+      } finally {
+        this.isProcessing = false;
+      }
     },
 
     areCardFieldsValid() {
+      if (this.form.cardHolderName.trim().length > 20) return false;
 
-      // Verificar que cardHolder no tenga más de 20 caracteres
-      if (this.form.cardHolderName.trim().length > 20) {
-        return false;
-      }
+      if (this.form.cvv.length !== 3) return false;
 
-      // Verificar que cvv tenga 3 digitos
-      if (this.form.cvv.length !== 3) {
-        return false;
-      }
-
-      // Verificar que expirationDate tenga el formato MM/DD/YY
       const datePattern = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d\d$/;
-      if (!datePattern.test(this.form.expirationDate)) {
-        return false;
-      }
+      if (!datePattern.test(this.form.expirationDate)) return false;
 
-      // Verificar que cardNumber tenga exactamente 16 dígitos
-      if (this.form.cardNumber.trim().length !== 16) {
-        return false;
-      }
+      if (this.form.cardNumber.trim().length !== 16) return false;
 
       return true;
     },
 
     areCardFieldsComplete() {
-      // Verificar que todos los campos estén completos
       if (!this.form.cardHolderName || !this.form.cardNumber || !this.form.expirationDate || !this.form.cvv) {
         return false;
       }
-
       return true;
     },
 
-    navigateToPreliminar() {
-      this.$router.push('/setup');
+    navigateToLogin() {
+      this.$router.push('/login');
     }
 
   }
@@ -112,18 +121,19 @@ export default {
         <input type="text" placeholder="Card Number" class="input-field  p-3" v-model="form.cardNumber"/>
 
         <div class="cardinfo-container">
-          <input type="text" placeholder="Expiration date" class="input-field p-3" v-model="form.expirationDate"/>
+          <input type="text" placeholder="Expiration date (MM/DD/YY)" class="input-field p-3" v-model="form.expirationDate"/>
           <input type="text" placeholder="CVV" class="input-field p-3" v-model="form.cvv"/>
         </div>
 
         <button type="submit" class="button p-3 uppercase font-medium text-md"
-                style="color: #fff; margin-top:30px">Pay
+                style="color: #fff; margin-top:30px" :disabled="isProcessing">
+          {{ isProcessing ? 'Processing...' : 'Pay & Complete Registration' }}
         </button>
       </form>
     </div>
 
   </div>
-  <!-- Display modal when the inputs are empty -->
+
   <pv-dialog :style="{margin: '0 10px'}" :visible.sync="isFieldsEmpty" :modal="true" :closable="false">
     <div class="error-modal p-5 flex flex-column align-items-center gap-5 text-center">
       <i class="text-7xl pi pi-times-circle text-red-500"></i>
@@ -132,7 +142,7 @@ export default {
       <pv-button class="py-3 px-5" label="OK" @click="isFieldsEmpty = false"/>
     </div>
   </pv-dialog>
-  <!-- display modal when the inputs format are not valid -->
+
   <pv-dialog :style="{margin: '0 10px'}" :visible.sync="areFieldsNotValid" :modal="true" :closable="false">
     <div class="error-modal p-5 flex flex-column align-items-center gap-5 text-center">
       <i class="text-7xl pi pi-exclamation-triangle text-yellow-500"></i>
@@ -141,13 +151,14 @@ export default {
       <pv-button class="py-3 px-5" label="OK" @click="areFieldsNotValid = false"/>
     </div>
   </pv-dialog>
-  <!--  Display modal when the payment form has accepted-->
+
+  <!-- Modal de éxito -->
   <pv-dialog :style="{margin: '0 10px'}" :visible.sync="paymentSuccess" :modal="true" :closable="false">
     <div class="error-modal p-5 flex flex-column align-items-center gap-5 text-center">
       <i class="text-7xl pi pi-check-circle text-green-500"></i>
-      <h1>Your payment was successfull!</h1>
-      <p class="text-md">Customize your organization to start a new adventure</p>
-      <pv-button style="letter-spacing: .8px" class="py-3 px-5" label="Next step" @click="navigateToPreliminar()"/>
+      <h1>Welcome Aboard!</h1>
+      <p class="text-md">Your payment was successful and your account has been created.</p>
+      <pv-button style="letter-spacing: .8px" class="py-3 px-5" label="Go to Login" @click="navigateToLogin()"/>
     </div>
   </pv-dialog>
 </template>
@@ -218,6 +229,10 @@ export default {
 .button:hover {
   background-color: #d16716ff;
 }
+.button:disabled {
+  background-color: #fccda4;
+  cursor: not-allowed;
+}
 
 
 @media screen and (max-width: 500px) {
@@ -232,10 +247,6 @@ export default {
   }
 
   .input-field {
-    width: 100%;
-  }
-
-  .link {
     width: 100%;
   }
 

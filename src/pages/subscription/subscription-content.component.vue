@@ -6,8 +6,22 @@ export default {
   components: {
     CheckIcon
   },
+  mounted() {
+    const tempData = localStorage.getItem('temp_register_data');
+    if (!tempData) {
+      this.$router.push('/signup');
+    }
+  },
   methods: {
     navigateToPayment() {
+      const planDetails = {
+        name: 'Annual Plan',
+        price: 300.00,
+        currency: 'PEN',
+        period: 'year'
+      };
+      localStorage.setItem('selected_plan', JSON.stringify(planDetails));
+
       this.$router.push('/payment');
     }
   }

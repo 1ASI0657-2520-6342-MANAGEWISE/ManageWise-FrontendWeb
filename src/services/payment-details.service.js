@@ -8,12 +8,12 @@ export class PaymentDetailsService {
     constructor() {
         this.userService = new UserService();
         this.http = axios.create({
-            baseURL: environment.baseUrl
+            baseURL: environment.baseUrl // http://localhost:7000
         })
     }
+
     async savePaymentDetails(paymentDetails) {
         const headers = this.userService.getHeadersAuthorization();
-        return await this.http.post("payment-detail", paymentDetails, {headers});
+        return await this.http.post("payments/api/PaymentDetails", paymentDetails, {headers});
     }
-
 }
