@@ -11,11 +11,12 @@ import Dropdown from 'primevue/dropdown'
 import { useStore } from 'vuex'
 import TeamMembersService from '@/services/team-members.service'
 
+// id = projectId
 const props = defineProps({
   id: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 })
 
 const store = useStore()
@@ -27,37 +28,34 @@ const teamMembersService = new TeamMembersService()
 const reload = ref(false)
 const allTasks = ref([])
 const loading = ref(false)
+
+// diálogo para NUEVA tarea
 const visible = ref(false)
 const newTask = ref(new TaskEntity())
-const teamMembers = ref([])   // <--- importante
+
+// lista de miembros de equipo (id + name)
+const teamMembers = ref([])
+
+// proyecto seleccionado (para mostrar card arriba)
 const project = computed(() => store.state.selectedProject)
 
+// ---------- CARGA DE TAREAS ----------
 const fetchTasks = async () => {
   loading.value = true
   allTasks.value = await fetchTaskData(props.id)
   loading.value = false
 }
 
-const emit = defineEmits(['updAll'])
-
-const handleUpdateAll = () => {
-  fetchTasks()
-}
-
-onMounted(async () => {
-  await fetchTasks()
-  await fetchTeamMembers()
-})
-
+// ---------- CARGA DE TEAM MEMBERS ----------
 const fetchTeamMembers = async () => {
   try {
     const members = await teamMembersService.getMembers(store.state.user.companyId)
     console.log('fetchTeamMembers members:', members)
 
     if (Array.isArray(members)) {
-      teamMembers.value = members.map(member => ({
-        id: member.id,
-        name: member.name
+      teamMembers.value = members.map(m => ({
+        id: m.id,
+        name: m.name
       }))
     } else {
       console.error('TeamMembers NO es un array:', members)
@@ -69,51 +67,194 @@ const fetchTeamMembers = async () => {
   }
 }
 
-const getTasksByState = (state) =>
-    allTasks.value.filter(task => task.state === state)
+onMounted(async () => {
+  await fetchTasks()
+  await fetchTeamMembers()
+})
+
+// ---------- UTILIDADES ----------
+const getTasksByState = (state) => {
+  return allTasks.value.filter(task => task.state === state)
+}
 
 const addsTask = () => {
+  // reset de la entidad
+  newTask.value = new TaskEntity()
   visible.value = true
 }
 
+// Crear tarea nueva
 const createTask = async (stateColumn) => {
   if (!newTask.value.title || !newTask.value.assignedID || !newTask.value.due) {
     alert('Por favor, ingrese el título, el asignado y la fecha de vencimiento para la nueva tarea.')
     return
   }
+
   try {
-    const TaskData = {
+    const taskPayload = {
       title: newTask.value.title,
       description: newTask.value.description,
-      assigned: newTask.value.assignedID,
+      // el service usa "due" y "assignedID" y allí los mapea a dueDate / assigneeId
       due: newTask.value.due.toISOString().split('T')[0],
       state: stateColumn || 'To-Do',
+      assignedID: newTask.value.assignedID
     }
-    await addTask(props.id, TaskData)
+
+    await addTask(props.id, taskPayload)
     newTask.value = new TaskEntity()
     visible.value = false
-    fetchTasks()
+    await fetchTasks()
   } catch (error) {
     console.error('Error al agregar el proyecto:', error.response?.data || error)
-    alert('error al agregar el proyecto:' + (error.response?.data || error))
+    alert('Error al agregar el proyecto: ' + (error.response?.data || error))
   }
 }
 
+// recargar todo (se usa cuando se elimina/edita desde card)
+const handleUpdateAll = () => {
+  fetchTasks()
+}
 
+// cuando una card emite que fue movida
 const handleTaskMoved = (updatedTask) => {
-  allTasks.value = allTasks.value.map(t =>
-      t.id === updatedTask.id ? { ...t, ...updatedTask } : t
-  )
+  const idx = allTasks.value.findIndex(t => t.id === updatedTask.id)
+  if (idx !== -1) {
+    allTasks.value[idx] = { ...allTasks.value[idx], ...updatedTask }
+  } else {
+    allTasks.value.push(updatedTask)
+  }
 }
 </script>
 
 <template>
   <section class="board-bg">
     <div class="board-container">
+      <!-- HEADER CON PROYECTO + TÍTULO Y BOTÓN -->
+      <header class="board-header">
+        <div v-if="project" class="project-summary-card modern">
+          <img
+              v-if="project.imageUrl && project.imageUrl[0]"
+              :src="project.imageUrl[0]"
+              alt="Project image"
+              class="project-summary-img"
+          />
+          <div class="project-summary-info">
+            <h1 class="title-projects">{{ project.name }}</h1>
+            <p class="project-summary-desc">{{ project.description }}</p>
+            <div class="project-summary-meta">
+              <span v-if="project.projectDate" class="meta-item">
+                <i class="pi pi-calendar"></i> {{ project.projectDate }}
+              </span>
+              <span v-if="project.projectLocation" class="meta-item">
+                <i class="pi pi-map-marker"></i> {{ project.projectLocation }}
+              </span>
+              <span v-if="project.audit" class="meta-item">
+                <i class="pi pi-clock"></i> Audit: {{ project.audit }}
+              </span>
+            </div>
+          </div>
+        </div>
 
-      <Dialog modal:true class="p-dialog" v-model:visible="visible" :closeOnOutsideClick="true">
+        <div class="board-header-actions">
+          <h3 class="subtitle">Tareas asignadas</h3>
+          <Button
+              v-if="!isTeamMember"
+              class="add-task modern"
+              @click="addsTask"
+          >
+            <i class="pi pi-plus-circle" style="margin-right:0.5rem;"></i>
+            Nueva tarea
+          </Button>
+        </div>
+      </header>
+
+      <!-- DIALOG NUEVA TAREA -->
+      <Dialog modal class="p-dialog" v-model:visible="visible" :closeOnOutsideClick="true">
+        <form
+            class="modern-task-dialog flex-dialog"
+            @submit.prevent="() => createTask('To-Do')"
+            autocomplete="off"
+        >
+          <div class="dialog-header">
+            <span class="dialog-icon"><i class="pi pi-plus-circle"></i></span>
+            <div>
+              <h2 class="dialog-title">Add New Task</h2>
+              <p class="dialog-sub">Fill in the details below to create a new task.</p>
+            </div>
+          </div>
+
+          <div class="dialog-fields">
+            <div class="dialog-field">
+              <label for="title" class="dialog-label">Title</label>
+              <InputText
+                  id="title"
+                  class="dialog-input"
+                  autocomplete="off"
+                  v-model="newTask.title"
+                  placeholder="Task title"
+                  required
+                  aria-required="true"
+              />
+            </div>
+
+            <div class="dialog-field">
+              <label for="description" class="dialog-label">Description</label>
+              <InputText
+                  id="description"
+                  class="dialog-input"
+                  autocomplete="off"
+                  v-model="newTask.description"
+                  placeholder="Task description"
+              />
+            </div>
+
+            <div class="dialog-field">
+              <label for="assigned" class="dialog-label">Employee Assigned</label>
+              <Dropdown
+                  id="assigned"
+                  class="dialog-input"
+                  v-model="newTask.assignedID"
+                  :options="teamMembers"
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Select employee"
+                  required
+                  aria-required="true"
+              />
+            </div>
+
+            <div class="dialog-field">
+              <label for="due" class="dialog-label">Due date</label>
+              <Calendar
+                  id="due"
+                  v-model="newTask.due"
+                  :minDate="new Date()"
+                  :manualInput="false"
+                  class="dialog-input"
+                  placeholder="Select date"
+                  required
+                  aria-required="true"
+              />
+            </div>
+          </div>
+
+          <div class="dialog-actions">
+            <Button
+                type="button"
+                label="Cancel"
+                text
+                @click="visible = false"
+            />
+            <Button
+                label="Add Task"
+                type="submit"
+                class="dialog-add-btn"
+            />
+          </div>
+        </form>
       </Dialog>
 
+      <!-- COLUMNAS -->
       <div v-if="loading" class="loader-modern">Cargando tareas...</div>
       <main v-else class="columns-board">
         <columnC
@@ -150,7 +291,6 @@ const handleTaskMoved = (updatedTask) => {
     </div>
   </section>
 </template>
-
 
 <style scoped>
 .board-bg {
@@ -312,11 +452,6 @@ const handleTaskMoved = (updatedTask) => {
   }
 }
 @media (max-width: 500px) {
-  .modern-task-dialog, .flex-dialog {
-    max-width: 98vw;
-    min-width: 0;
-    padding: 1.2rem 0.5rem 1rem 0.5rem;
-  }
   .board-bg {
     padding: 0.5rem 0 1rem 0;
   }

@@ -164,7 +164,7 @@ const items = ref([
 <template>
   <div
       class="task-card"
-      style="margin-bottom: 1.2rem; border-bottom: 4px solid #4CAF50; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"
+      style="margin-bottom: 1.2rem; border-bottom: 4px solid #fb923c; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"
   >
     <div class="title">
       <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
@@ -185,7 +185,7 @@ const items = ref([
         </p>
       </div>
       <div style="font-size: 0.92em; color: #888; margin-bottom: 0.2rem;">
-        Estado: <span style="color: #4CAF50;">{{ state }}</span>
+        Estado: <span style="color: #fb923c;">{{ state }}</span>
       </div>
       <div style="color: #666; font-size: 0.97em; margin-bottom: 0.2rem;">
         {{ description }}
@@ -193,24 +193,24 @@ const items = ref([
     </div>
   </div>
 
-  <Dialog modal:true class="p-dialog" v-model:visible="visible" :closeOnOutsideClick="true" :style="{ width: '500px' }">
+  <Dialog modal:true class="p-dialog custom-dialog" v-model:visible="visible" :closeOnEscape="true" :style="{ width: '520px' }">
     <template #header>
       <div style="width: 100%;">
-        <h2 style="margin: 0; font-size: 1.5rem; color: #02513D; font-weight: 600;">
+        <h2 style="margin: 0; font-size: 1.3rem; color: #2c3e50; font-weight: 600;">
           <i class="pi pi-pencil" style="margin-right: 0.5rem;"></i>
           Edit Task
         </h2>
-        <p style="margin: 0.5rem 0 0 0; color: #666; font-size: 0.9rem;">
+        <p style="margin: 0.3rem 0 0 0; color: #7f8c8d; font-size: 0.85rem;">
           Update your task information below
         </p>
       </div>
     </template>
 
-    <div style="padding: 1.5rem 0;">
+    <div style="padding: 1rem 0; position: relative; z-index: 1;">
       <!-- Task Title -->
-      <div class="input-group" style="margin-bottom: 1.5rem;">
+      <div class="input-group" style="margin-bottom: 1rem;">
         <label for="title" class="input-label">
-          <i class="pi pi-file-edit" style="margin-right: 0.5rem; color: #02513D;"></i>
+          <i class="pi pi-file-edit" style="margin-right: 0.4rem; color: #5a6c7d;"></i>
           Task Title
         </label>
         <InputText
@@ -223,9 +223,9 @@ const items = ref([
       </div>
 
       <!-- Description -->
-      <div class="input-group" style="margin-bottom: 1.5rem;">
+      <div class="input-group" style="margin-bottom: 1rem;">
         <label for="description" class="input-label">
-          <i class="pi pi-align-left" style="margin-right: 0.5rem; color: #02513D;"></i>
+          <i class="pi pi-align-left" style="margin-right: 0.4rem; color: #5a6c7d;"></i>
           Description
         </label>
         <InputText
@@ -238,9 +238,9 @@ const items = ref([
       </div>
 
       <!-- Employee Assigned -->
-      <div class="input-group" style="margin-bottom: 1.5rem;">
+      <div class="input-group" style="margin-bottom: 1rem;">
         <label for="assigned" class="input-label">
-          <i class="pi pi-user" style="margin-right: 0.5rem; color: #02513D;"></i>
+          <i class="pi pi-user" style="margin-right: 0.4rem; color: #5a6c7d;"></i>
           Assigned To
         </label>
         <Dropdown
@@ -255,9 +255,9 @@ const items = ref([
       </div>
 
       <!-- Due Date -->
-      <div class="input-group" style="margin-bottom: 1.5rem;">
+      <div class="input-group" style="margin-bottom: 0.5rem;">
         <label for="calendar" class="input-label">
-          <i class="pi pi-calendar" style="margin-right: 0.5rem; color: #02513D;"></i>
+          <i class="pi pi-calendar" style="margin-right: 0.4rem; color: #5a6c7d;"></i>
           Due Date
         </label>
         <Calendar
@@ -268,25 +268,21 @@ const items = ref([
             :minDate="new Date()"
             :manualInput="false"
             dateFormat="yy-mm-dd"
+            appendTo="self"
         />
       </div>
     </div>
 
     <template #footer>
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
-        <Button
-            label="Cancel"
-            icon="pi pi-times"
-            @click="visible = false"
-            text
-            style="color: #666;"
-        />
-        <Button
-            label="Save Changes"
-            icon="pi pi-check"
-            @click="editFunc(props.projectId)"
-            style="background-color: #02513D; border: none;"
-        />
+      <div class="dialog-footer">
+        <button class="btn-cancel" @click="visible = false">
+          <i class="pi pi-times"></i>
+          Cancel
+        </button>
+        <button class="btn-save" @click="editFunc(props.projectId)">
+          <i class="pi pi-check"></i>
+          Save Changes
+        </button>
       </div>
     </template>
   </Dialog>
@@ -329,6 +325,22 @@ const items = ref([
 }
 
 /* Estilos mejorados para el diálogo */
+.custom-dialog .p-dialog-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.custom-dialog .p-dialog-content {
+  background-color: #ffffff;
+  overflow: visible !important;
+}
+
+.custom-dialog .p-dialog-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  padding: 1rem 1.5rem !important;
+}
+
 .input-group {
   display: flex;
   flex-direction: column;
@@ -336,9 +348,9 @@ const items = ref([
 
 .input-label {
   font-weight: 600;
-  font-size: 0.95rem;
-  color: #333;
-  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #495057;
+  margin-bottom: 0.4rem;
   display: flex;
   align-items: center;
 }
@@ -347,29 +359,55 @@ const items = ref([
 .custom-dropdown,
 .custom-calendar {
   width: 100%;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
 }
 
 .custom-input:focus,
 .custom-dropdown:focus,
 .custom-calendar:focus {
-  border-color: #02513D;
-  box-shadow: 0 0 0 3px rgba(2, 81, 61, 0.1);
+  border-color: #fb923c;
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
   outline: none;
 }
 
+.custom-input:hover,
+.custom-dropdown:hover,
+.custom-calendar:hover {
+  border-color: #adb5bd;
+}
+
 .custom-input::placeholder {
-  color: #999;
+  color: #adb5bd;
+}
+
+/* Fix definitivo para el calendario */
+.custom-calendar {
+  position: relative;
+}
+
+.custom-calendar .p-inputtext {
+  width: 100%;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.custom-calendar .p-datepicker {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  margin-top: 0.25rem !important;
+  z-index: 9999 !important;
 }
 
 /* Mejorar el diálogo general */
 .p-dialog .p-dialog-header {
-  padding: 1.5rem 1.5rem 1rem 1.5rem;
-  border-bottom: 2px solid #f0f0f0;
+  padding: 1.25rem 1.5rem;
 }
 
 .p-dialog .p-dialog-content {
@@ -377,6 +415,66 @@ const items = ref([
 }
 
 .p-dialog .p-dialog-footer {
-  padding: 0 1.5rem 1.5rem 1.5rem;
+  padding: 0 1.5rem 1.25rem 1.5rem;
+}
+
+/* Botones personalizados modernos */
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.btn-cancel,
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-cancel {
+  background-color: #ffffff;
+  color: #6b7280;
+  border: 1.5px solid #d1d5db;
+}
+
+.btn-cancel:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.btn-cancel:active {
+  transform: scale(0.98);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(251, 146, 60, 0.3);
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-save:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-cancel i,
+.btn-save i {
+  font-size: 0.875rem;
 }
 </style>
