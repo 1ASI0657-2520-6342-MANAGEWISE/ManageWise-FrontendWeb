@@ -324,7 +324,6 @@ const items = ref([
   transition: 0.1s;
 }
 
-/* Estilos mejorados para el diálogo */
 .custom-dialog .p-dialog-header {
   background-color: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
@@ -385,7 +384,6 @@ const items = ref([
   color: #adb5bd;
 }
 
-/* Fix definitivo para el calendario */
 .custom-calendar {
   position: relative;
 }
@@ -405,7 +403,6 @@ const items = ref([
   z-index: 9999 !important;
 }
 
-/* Mejorar el diálogo general */
 .p-dialog .p-dialog-header {
   padding: 1.25rem 1.5rem;
 }
@@ -418,7 +415,6 @@ const items = ref([
   padding: 0 1.5rem 1.25rem 1.5rem;
 }
 
-/* Botones personalizados modernos */
 .dialog-footer {
   display: flex;
   justify-content: flex-end;

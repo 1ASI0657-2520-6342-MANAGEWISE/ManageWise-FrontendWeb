@@ -15,17 +15,15 @@ export default {
       required: true
     }
   },
-  async mounted() {
-    await this.teamMemberService.getMembers(this.$store.state.user.companyId)
-        .then(r => {
-          if (r) this.members = r.data.length;
-        })
-  },
   computed: {
     user() {
-      console.log(this.$store.state);
-      console.log(this.$store.state.user);
-      return this.$store.state.user;
+      return this.$store.state.user || {};
+    },
+    // CORRECCIÓN 1: Transformar el '0' en un texto legible
+    roleLabel() {
+      const role = this.user.role;
+      if (role === 0 || role === '0') return 'Manager';
+      return role || '';
     }
   },
   methods: {
@@ -33,7 +31,36 @@ export default {
       this.toggleNav();
     },
     navigateToProfile() {
-      this.$router.push(`/profile/${this.user.id}`);
+      if (this.user && this.user.id) {
+        this.$router.push(`/profile/${this.user.id}`);
+      }
+    },
+    // Método separado para buscar miembros
+    async fetchMembers(companyId) {
+      if (!companyId) {
+        this.members = 0;
+        return;
+      }
+      try {
+        const response = await this.teamMemberService.getMembers(companyId);
+        if (response && response.data) {
+          this.members = response.data.length;
+        } else {
+          this.members = 0;
+        }
+      } catch (error) {
+        console.error("Error obteniendo miembros:", error);
+        this.members = 0;
+      }
+    }
+  },
+  // CORRECCIÓN 2: Usar watch para esperar a que el companyId cargue en el store
+  watch: {
+    'user.companyId': {
+      immediate: true,
+      handler(newId) {
+        this.fetchMembers(newId);
+      }
     }
   }
 }
@@ -41,7 +68,6 @@ export default {
 
 <template>
   <pv-toolbar class="header h-7rem px-4 w-full">
-    <!--pone los contenedores en este caso uno al final y el otro al principio con #start y #end de la toolbar-->
     <template #start>
       <div class=" flex flex-row align-items-center gap-4">
         <i class="pi pi-bars" @click="handleToggle" style="color: slateblue; font-size: 1.5rem; cursor: pointer"></i>
@@ -49,7 +75,8 @@ export default {
           <img class="block h-2rem w-3rem" src="../assets/ManageWise_logo.png" alt="ManageWise"/>
           <div class="title-container flex flex-column justify-content-center line-height-2" style="gap: 2px">
             <p class="title font-semibold " style="letter-spacing: 1px;">ManageWise</p>
-            <span class="text-sm capitalize" style="letter-spacing: .8px;">{{ user.role }}</span>
+            <!-- Usamos roleLabel en vez de user.role -->
+            <span class="text-sm capitalize" style="letter-spacing: .8px;">{{ roleLabel }}</span>
           </div>
         </div>
       </div>
@@ -66,7 +93,7 @@ export default {
           <p class="font-medium user-name"
              @click="navigateToProfile"
              :class="{ active: $route.path === '/profile' }">
-             {{ user.name }}</p>
+            {{ user.name }}</p>
           <div class="flex flex-row align-items-center gap-3">
             <p class="text-sm text-green-600 font-normal">{{ user?.companyName }}</p>
             <div class="members-quantity">

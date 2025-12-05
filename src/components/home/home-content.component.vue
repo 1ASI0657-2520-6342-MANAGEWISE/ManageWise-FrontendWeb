@@ -20,11 +20,28 @@ export default {
       return this.$store.state.user;
     }
   },
+  // CORRECCIÓN 1: Quitamos created() porque dispara la petición demasiado rápido (cuando user es null)
+  /*
   async created() {
     await this.fetchNewPosts();
   },
+  */
+
+  // CORRECCIÓN 2: Usamos watch para disparar la petición SOLO cuando tengamos datos del usuario
+  watch: {
+    user: {
+      immediate: true, // Intenta ejecutar al inicio
+      handler(newUser) {
+        // Solo llamamos a la API si el usuario y el companyId existen
+        if (newUser && newUser.companyId) {
+          this.fetchNewPosts();
+        }
+      }
+    }
+  },
   methods: {
     formatDate(dateString) {
+      if (!dateString) return "";
       const date = new Date(dateString);
       return date.toLocaleString("en-US", {
         year: "numeric",
@@ -39,7 +56,6 @@ export default {
     buildPostListFromResponseData(payload) {
       console.log("Building post list from response data", payload);
 
-      // Acepta array directo o { data: [...] }
       const list = Array.isArray(payload)
           ? payload
           : (payload?.data ?? []);
@@ -47,7 +63,10 @@ export default {
       if (!Array.isArray(list)) return [];
 
       return list.map((item) => {
-        const formattedDate = this.formatDate(item.postTime);
+        // Manejamos PostTime o CreatedAt por si acaso
+        const dateToUse = item.postTime || item.createdAt || new Date().toISOString();
+        const formattedDate = this.formatDate(dateToUse);
+
         return new PostEntity(
             item.id,
             item.title,
@@ -67,11 +86,13 @@ export default {
     },
 
     async fetchNewPosts() {
+      // Guard de seguridad extra
+      if (!this.user?.companyId) return;
+
       try {
         this.hasLoading = true;
         this.hasError = false;
 
-        // getAllPostsByCompanyId DEBE devolver res.data (un array)
         const items = await this.postApi.getAllPostsByCompanyId(this.user.companyId, 5);
 
         this.posts = this.buildPostListFromResponseData(items);
@@ -102,9 +123,7 @@ export default {
   </section>
 </template>
 
-
 <style scoped>
-
 section {
   background-color: #FFF;
 }
@@ -134,5 +153,4 @@ section {
   height: 18rem;
   object-fit: cover;
 }
-
 </style>

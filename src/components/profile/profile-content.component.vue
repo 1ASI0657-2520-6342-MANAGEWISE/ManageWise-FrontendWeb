@@ -34,8 +34,12 @@ export default {
           .filter(task => !this.taskFilters.status || task.status === this.taskFilters.status)
           .filter(task => !this.taskFilters.date || task.dueDate === this.taskFilters.date);
     },
+    // --- CORRECCIÓN APLICADA AQUÍ ---
     isManager() {
-      return this.user?.role === 'Manager';
+      // Convertimos el rol a string y minúsculas para asegurar la comparación
+      const role = String(this.user?.role || '').toLowerCase().trim();
+      // Ahora retorna TRUE si es '0' (Director) o 'manager'
+      return role === '0' || role === 'manager';
     },
     teamCode() {
       return this.user?.teamRegisterCode || '';
@@ -285,6 +289,7 @@ export default {
           <span class="non-editable">{{ user.companyName}}</span>
         </p>
 
+        <!-- AHORA ESTE DIV SE MOSTRARÁ SI EL ROL ES '0' O 'MANAGER' -->
         <div v-if="isManager" class="editable">
           <div class="team-code-row">
             <strong>Team Code:</strong>
@@ -363,7 +368,8 @@ export default {
         <pv-button class="py-3 px-5" label="OK" @click="isFieldsEmpty = false"/>
       </div>
     </pv-dialog>
-    <div class="container-for-task" v-if="this.$store.state.user.role !== 'Manager'">
+    <!-- Actualizamos también esta condición para ser consistente: Si no es manager, ve las tareas -->
+    <div class="container-for-task" v-if="!isManager">
       <div class="user-tasks" style="margin-top: 2rem;">
         <h1 style="margin-bottom: 1rem;">My Tasks</h1>
         <!-- Filtros -->
