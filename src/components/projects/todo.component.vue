@@ -94,10 +94,9 @@ const createTask = async (stateColumn) => {
     const taskPayload = {
       title: newTask.value.title,
       description: newTask.value.description,
-      // el service usa "due" y "assignedID" y allí los mapea a dueDate / assigneeId
       due: newTask.value.due.toISOString().split('T')[0],
       state: stateColumn || 'To-Do',
-      assignedID: newTask.value.assignedID
+      assigned: newTask.value.assignedID
     }
 
     await addTask(props.id, taskPayload)

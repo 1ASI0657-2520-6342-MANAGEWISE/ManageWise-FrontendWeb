@@ -51,17 +51,41 @@ export default {
       if (this.post && this.post.userImage) return this.post.userImage;
       return "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg";
     },
+    displayCompanyName() {
+      return this.user?.companyName || "Team";
+    }
   },
   methods: {
-    onClickLike() {
-      if (this.hasLiked) return;
-      this.hasLiked = true;
-      this.likeCount++;
-      this.postApi.updatePostRating(this.post.id, this.user.id);
-      if (this.hasLiked) {
-        this.hasLiked = true;
+    async onClickLike() {
+      this.hasLiked = !this.hasLiked;
+      this.likeCount += this.hasLiked ? 1 : -1;
+
+      try {
+        await this.postApi.updatePostRating(this.post.id, this.user.id);
+
+        if (this.hasLiked) {
+        }
+      } catch (error) {
+        console.error("Error updating like:", error);
+        this.hasLiked = !this.hasLiked;
+        this.likeCount += this.hasLiked ? 1 : -1;
       }
     },
+
+    async checkUserLikeStatus() {
+      if (!this.user?.id) return;
+
+      try {
+        const response = await this.postApi.http.get(`collaborate/Posts/user/${this.user.id}/liked`);
+        const likedPosts = response.data || [];
+
+        this.hasLiked = likedPosts.some(p => p.id === this.post.id);
+
+      } catch (error) {
+        console.error("Error checking like status:", error);
+      }
+    },
+
     generateRandomImagesForPosts() {
       let selectedImages = [];
       let randomNumbers = new Set();
@@ -77,7 +101,7 @@ export default {
     },
   },
   mounted() {
-    console.log("[PostCard] post recibido:", this.post);
+    this.checkUserLikeStatus();
   },
 };
 </script>
@@ -107,7 +131,6 @@ export default {
               class="like-btn"
               :class="{ liked: hasLiked }"
               @click="onClickLike"
-              :disabled="hasLiked"
               aria-label="Like post"
           >
             <i :class="['pi', hasLiked ? 'pi-heart-fill' : 'pi-heart', 'like-icon']"></i>
@@ -126,7 +149,7 @@ export default {
         <span class="subject-label">Subject:</span>
         <span class="subject-value">{{ post.subject }}</span>
       </div>
-      <span class="greeting">Dear Hope Haven Team,</span>
+      <span class="greeting">Dear {{ displayCompanyName }} Team,</span>
     </template>
 
     <template #content>
@@ -223,10 +246,6 @@ export default {
 .like-btn.liked .like-icon {
   color: #e11d48;
   animation: pop 0.3s;
-}
-.like-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 .like-icon {
   font-size: 1.5rem;
