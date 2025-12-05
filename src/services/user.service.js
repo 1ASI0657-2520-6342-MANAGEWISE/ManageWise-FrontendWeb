@@ -10,6 +10,7 @@ export class UserService {
         })
     }
 
+
     async signUpUser(user) {
         try {
             const signUpPayload = {
@@ -32,6 +33,8 @@ export class UserService {
                 CompanyEmail: user.companyEmail,
                 CompanyCountry: user.companyCountry,
                 TeamRegisterCode: user.teamRegisterCode,
+                Occupation: user.occupation || "",
+                Bio: user.bio || ""
             };
 
             console.log('Sending profile details to Profiles (Step 2):', profilePayload);
@@ -59,7 +62,18 @@ export class UserService {
 
             console.log('Sending sign-in payload to IAM:', signInPayload);
 
-            return await this.http.post('authentication/sign-in', signInPayload)
+            const response = await this.http.post('authentication/sign-in', signInPayload);
+
+            if (response.data && response.data.username) {
+                console.log("Login exitoso en IAM. Buscando perfil completo...");
+                try {
+                    await this.getUserByEmail(response.data.username);
+                } catch (profileError) {
+                    console.error("No se pudo cargar el perfil del usuario:", profileError);
+                }
+            }
+
+            return response;
         } catch (e) {
             if (e.response) {
                 console.error('Backend 400 Sign-In Response Data (Validation Errors):', e.response.data);
@@ -70,79 +84,50 @@ export class UserService {
     }
 
 
-    async getAllUsers() {
+    async getUserByEmail(email) {
+        const headers = this.getHeadersAuthorization();
         try {
-            const headers = this.getHeadersAuthorization();
-            const response = await this.http.get('users/', { headers });
+            const response = await this.http.get(`profiles/api/Profiles/email/${email}`, { headers });
+
+            console.log('Perfil recuperado por Email:', response.data);
+
+            this.setUser(response.data);
+
             return response;
         } catch (error) {
-            console.error('Error al obtener todos los usuarios:', error);
+            console.error(`Error al obtener usuario por email ${email}:`, error);
             throw error;
         }
     }
 
-    async getCompanyInformationByCode(identificationCode) {
-        try {
-            const companyResponse = await this.http.get(`companies/?identificationCode=${identificationCode}`);
-            return companyResponse.data[0];
-        } catch (error) {
-            console.error(`Error al obtener la información de la compañía con el código de identificación ${identificationCode}:`, error);
-            throw error;
-        }
-    }
-
-    async getUserById( id ){
+    async getUserById(id) {
         const headers = this.getHeadersAuthorization();
-        console.log('headers', headers)
-        console.log('user id to retrieve', id)
+        console.log('user id to retrieve', id);
         try {
             const response = await this.http.get(`profiles/api/Profiles/${id}`, { headers });
 
-            console.log('Datos Crudos del Backend (revisa las mayúsculas):', response.data);
-
             if (response.data) {
-
                 response.data.companyName = response.data.companyName
                     || response.data.CompanyName
                     || response.data.company_name
-                    || response.data.businessName
                     || "";
 
                 response.data.companyEmail = response.data.companyEmail
                     || response.data.CompanyEmail
                     || "";
+
+                response.data.occupation = response.data.occupation || response.data.Occupation || "";
+                response.data.bio = response.data.bio || response.data.Bio || "";
             }
 
-            console.log('Profile response (Corregido):', response);
+            console.log('Profile response:', response);
             return response;
         } catch (error) {
             if (error.response) {
                 console.error(`Error ${error.response.status} al obtener el usuario con id ${id}:`, error.response.data);
-                console.error('Response Headers:', error.response.headers);
             } else {
                 console.error(`Error de red al obtener el usuario con id ${id}:`, error.message);
             }
-            throw error;
-        }
-    }
-
-    async getUsersByRole( role ) {
-        try {
-            const response = await this.http.get(`users?role=${role}`);
-            return response;
-        } catch (error) {
-            console.error(`Error al obtener usuarios con el rol ${role}:`, error);
-            throw error;
-        }
-    }
-
-    async createNewUser( user ) {
-        try {
-            const headers = this.getHeadersAuthorization();
-            console.log('user to create', user)
-            return await this.http.post('users/', user, { headers });
-        } catch (error) {
-            console.error('Error al crear un nuevo usuario:', error);
             throw error;
         }
     }
@@ -169,39 +154,67 @@ export class UserService {
         };
 
         const resp = await this.http.put(`profiles/api/Profiles/${user.id}`, userbody, { headers });
+
+        this.setUser(resp.data);
+
         return resp.data;
     }
 
+    async getAllUsers() {
+        try {
+            const headers = this.getHeadersAuthorization();
+            const response = await this.http.get('users/', { headers });
+            return response;
+        } catch (error) {
+            console.error('Error al obtener todos los usuarios:', error);
+            throw error;
+        }
+    }
+
+    async getUsersByRole(role) {
+        try {
+            const response = await this.http.get(`users?role=${role}`);
+            return response;
+        } catch (error) {
+            console.error(`Error al obtener usuarios con el rol ${role}:`, error);
+            throw error;
+        }
+    }
+
+    async createNewUser(user) {
+        try {
+            const headers = this.getHeadersAuthorization();
+            console.log('user to create', user)
+            return await this.http.post('users/', user, { headers });
+        } catch (error) {
+            console.error('Error al crear un nuevo usuario:', error);
+            throw error;
+        }
+    }
 
     async updateUserByEmail(email, body) {
-        const newBody = {
-            firstName: body.firstName,
-            lastName: body.lastName,
-            age: body.age,
-            phone: body.phone,
-            occupation: body.occupation,
-            password: body.password,
-            profileImg: body.profileImg,
-            role: body.role,
-            companyName: body.companyName,
-            bio: body.bio,
-            companyId: body.companyId,
-        }
-
+        const newBody = { ...body }; // Simplificado
         try {
             const headers = this.getHeadersAuthorization();
             const response = await this.http.put(`users?email=${email}`, newBody, { headers });
             return response;
-        }catch(e) {
+        } catch(e) {
             console.log('Error to update user')
             return null;
         }
     }
 
+
     getHeadersAuthorization() {
+        const token = localStorage.getItem('token');
         return {
-            "Authorization": `Bearer ${localStorage.getItem('token')}`,
+            "Authorization": token ? `Bearer ${token}` : '',
             "Content-Type": "application/json"
         }
+    }
+
+    setUser(user) {
+        localStorage.setItem('user', JSON.stringify(user));
+
     }
 }
